@@ -3,11 +3,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:walletsolana/bloc/wallet/wallet_bloc.dart';
+import 'package:walletsolana/bloc/wallet/wallet_event.dart';
 import 'package:walletsolana/bloc/wallet/wallet_state.dart';
 import 'package:walletsolana/services/wallet_services.dart';
 import 'package:walletsolana/utilities/form_utilities.dart';
 import 'package:walletsolana/utilities/padding_utilities.dart';
 import 'package:walletsolana/utilities/text_utilities.dart';
+import 'package:solana_mobile_client/solana_mobile_client.dart';
 
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
@@ -20,8 +22,11 @@ class _MainScreenState extends State<MainScreen> {
   final SearchController = TextEditingController();
   final WalletService walletService = WalletService();
 
+  //public key işlemleri için
   String? pk;
   late var email;
+
+  //
 
   @override
   void initState() {
@@ -44,82 +49,102 @@ class _MainScreenState extends State<MainScreen> {
     const String assetPath = "assets/images/mainPageBackgroung.jpg";
     const String metamaskImage = "assets/images/metamask.png";
     const String phontomImage = "assets/images/phantom.png";
-    return BlocProvider(
-      create: (context) => WalletBloc(),
-      child: Scaffold(
-        body: Container(
-          width: screenSize.width,
-          height: screenSize.height,
-          decoration: BoxDecoration(
-            image: DecorationImage(
-              image: AssetImage(assetPath),
-              fit: BoxFit.cover,
-            ),
-          ),
-          child: Padding(
-            padding: const EdgeInsets.only(top: 80.0),
-            child: Column(
-              children: [
-                TitleLargeWigdet(
-                  text: TextUtilities.solidium,
-                  color: Colors.white,
+    return BlocBuilder<WalletBloc, WalletState>(
+        builder: (context, state) {
+          return Scaffold(
+            body: Container(
+              width: screenSize.width,
+              height: screenSize.height,
+              decoration: BoxDecoration(
+                image: DecorationImage(
+                  image: AssetImage(assetPath),
+                  fit: BoxFit.cover,
                 ),
-                SizedBox(height: 24),
-                Padding(
-                  padding: PaddingUtilities.paddingRightLeft * 2,
-                  child: EmailFormWidget(
-                    text: "Search",
-                    controller: SearchController,
-                  ),
-                ),
-                BlocConsumer<WalletBloc, WalletState>(
-                  listener: (context, state) {},
-                  builder: (context, state) {
-                    return Column(
-                      children: [
-                        Padding(
-                          padding: PaddingUtilities.paddingTop/2,
-                          child: TitleMediumWigdet(text: "Copy the wallet adress", color: Colors.white),
-                        ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
+              ),
+              child: Padding(
+                padding: const EdgeInsets.only(top: 80.0),
+                child: Column(
+                  children: [
+                    TitleLargeWigdet(
+                      text: TextUtilities.solidium,
+                      color: Colors.white,
+                    ),
+                    SizedBox(height: 24),
+                    Padding(
+                      padding: PaddingUtilities.paddingRightLeft * 2,
+                      child: EmailFormWidget(
+                        text: "Search",
+                        controller: SearchController,
+                      ),
+                    ),
+                    BlocConsumer<WalletBloc, WalletState>(
+                      listener: (context, state) {},
+                      builder: (context, state) {
+                        return Column(
                           children: [
-                            
-                            Expanded(
-                              child: Container(
-                                margin: PaddingUtilities.paddingRightLeft,
-                                height: 18,
-                                child: TextSmallWigdet(color: const Color.fromARGB(255, 210, 210, 210), text:pk ??"deneme" ,)
-                               
+                            Padding(
+                              padding: PaddingUtilities.paddingTop / 2,
+                              child: TitleMediumWigdet(
+                                text: "Copy the wallet adress",
+                                color: Colors.white,
                               ),
                             ),
-                            IconButton(
-                              onPressed: () {
-                                if (pk != null) {
-                                  Clipboard.setData(ClipboardData(text: pk!));
-                                }
-                              },
-                        
-                              icon: Icon(Icons.copy),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Expanded(
+                                  child: Container(
+                                    margin: PaddingUtilities.paddingRightLeft,
+                                    height: 18,
+                                    child: TextSmallWigdet(
+                                      color: const Color.fromARGB(
+                                        255,
+                                        210,
+                                        210,
+                                        210,
+                                      ),
+                                      text: pk ?? "deneme",
+                                    ),
+                                  ),
+                                ),
+                                IconButton(
+                                  onPressed: () {
+                                    if (pk != null) {
+                                      Clipboard.setData(
+                                        ClipboardData(text: pk!),
+                                      );
+                                    }
+                                  },
+
+                                  icon: Icon(Icons.copy),
+                                ),
+                              ],
+                            ),
+                            Padding(
+                              padding: PaddingUtilities.paddingTop / 2,
+                              child: TitleMediumWigdet(
+                                text: "Connect to Wallets",
+                                color: Colors.white,
+                              ),
                             ),
                           ],
-                        ),
-                        Padding(
-                          padding: PaddingUtilities.paddingTop/2,
-                          child: TitleMediumWigdet(text: "Connect to Wallets", color: Colors.white),
-                        ),
-
-                      ],
-                    );
-                  },
+                        );
+                      },
+                    ),
+                 IconButton(
+                      onPressed: () async {
+                        print("buton phantom");
+                        context.read<WalletBloc>().add(ConnectPhantomEvent());
+                      },
+                      icon: Image.asset(phontomImage),
+                    ) //süs
+                    
+                  ],
                 ),
-                IconButton(onPressed: () {}, icon: Image.asset(metamaskImage)),//süs
-                IconButton(onPressed: () {}, icon: Image.asset(phontomImage)),
-              ],
+              ),
             ),
-          ),
-        ),
-      ),
-    );
+          );
+        },
+      );
   }
 }

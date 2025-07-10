@@ -44,7 +44,7 @@ dependencies:
   flutter_bloc: ^9.1.1
   fluttertoast: ^8.2.12
   google_sign_in: ^6.1.4 # versiyonunu küçülttüm
-  solana_mobile_client: ^0.1.2
+  solana_mobile_client: ^0.1.2 #solana wallet aadapter yerine bunu kullanacağım
   solana: ^0.31.2+1
   flutter_secure_storage: ^9.2.4
   bip39: ^1.0.6

@@ -83,12 +83,15 @@ class FireStoreService {
         Fluttertoast.showToast(msg: "Login successful ");
       }
     } on FirebaseAuthException catch (e) {
+      
       Fluttertoast.showToast(msg: e.message!);
+      throw e;
     }
   }
 
   Future<bool> loginWithGoogle() async {
     final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
+
 
     GoogleSignInAuthentication userAuth = await googleUser!.authentication;
 

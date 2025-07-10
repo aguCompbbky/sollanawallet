@@ -10,9 +10,10 @@ class ButtonWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-    
+    return 
+      Card( 
       shape: StadiumBorder(side: BorderSide(width: 2, color: Colors.black)),
+      
     
         child: ElevatedButton(
           style: ElevatedButton.styleFrom(
