@@ -1,3 +1,5 @@
+
+
 abstract class WalletState {
   
 }
@@ -7,6 +9,9 @@ class InitialStateWallet extends WalletState {
 }
 
 class GetPKState extends WalletState {
+  final String? pk;
+
+  GetPKState({required this.pk});
   
 }
 
@@ -19,4 +24,8 @@ class WalletConnectedState extends WalletState{
   final String health;
 
   WalletConnectedState({required this.health});
+}
+class PhantomWalletConnectedState extends WalletState{
+
+  
 }

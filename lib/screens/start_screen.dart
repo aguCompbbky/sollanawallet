@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:walletsolana/utilities/button_utilities.dart';
-import 'package:walletsolana/utilities/color_utilities.dart';
 import 'package:walletsolana/utilities/text_utilities.dart';
 import 'package:go_router/go_router.dart';
 

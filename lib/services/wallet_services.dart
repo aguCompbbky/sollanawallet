@@ -1,13 +1,11 @@
 // 12 kelimelik mnemonic (seed phrase) üretir
 
-// import 'dart:convert';
-// import 'package:firebase_auth/firebase_auth.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:solana/solana.dart';
 import 'package:bip39/bip39.dart' as bip39;
-//import 'package:walletsolana/services/firestore_service.dart'; 
+
 
 
 class WalletService {
@@ -18,8 +16,6 @@ class WalletService {
 
   
   final secureStorage = const FlutterSecureStorage();
-  //final db = FireStoreService();
-  //late UserCredential user;
 
   /// 1. Yeni mnemonic üret
   Future<String> generateMnemonic() async {
@@ -35,7 +31,7 @@ class WalletService {
     );
   }
 
-  // /// 3. Wallet oluştur ve mnemonic + public address'i güvenli şekilde sakla
+  
   // Future<void> createAndStoreNewWallet() async {
   //   final mnemonic = await generateMnemonic();
   //   final wallet = await createWalletFromMnemonic(mnemonic);

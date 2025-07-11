@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -30,6 +28,7 @@ class _LogInScreenState extends State<LogInScreen> {
     return BlocProvider(
       create: (context) => AuthBloc(FireStoreService()),
       child: Scaffold(
+        resizeToAvoidBottomInset: false, //klavyenin taşıp bottom overflow olmasını engelliyor.
         appBar: AppBar(),
         body: Center(
           child: Column(
@@ -107,7 +106,7 @@ class _LogInScreenState extends State<LogInScreen> {
                                   passwordController.text,
                                 ),
                               ); // eventi başlat
-                            }, 
+                            },
                           ),
                         ),
                         _gap24px(),
@@ -118,9 +117,9 @@ class _LogInScreenState extends State<LogInScreen> {
                           children: [
                             IconButton(
                               onPressed: () {
-                                context.read<AuthBloc>().add(LoginWithGoogleEvent());
-
-
+                                context.read<AuthBloc>().add(
+                                  LoginWithGoogleEvent(),
+                                );
                               }, // google auth
                               icon: SizedBox(
                                 //color: Colors.white,

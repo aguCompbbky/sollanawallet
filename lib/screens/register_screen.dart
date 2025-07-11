@@ -32,6 +32,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     return BlocProvider(
       create: (context) => AuthBloc(FireStoreService()),
       child: Scaffold(
+        resizeToAvoidBottomInset: false,
         appBar: AppBar(),
 
         body: Center(

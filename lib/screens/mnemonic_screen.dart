@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:walletsolana/services/wallet_services.dart';
 import 'package:walletsolana/utilities/button_utilities.dart';
 import 'package:walletsolana/utilities/padding_utilities.dart';
-import 'package:walletsolana/utilities/text_utilities.dart';
 import 'package:go_router/go_router.dart';
 
 class MnemonicScreen extends StatefulWidget {
@@ -41,7 +40,6 @@ class _MnemonicScreenState extends State<MnemonicScreen> {
     // }
 
     return Scaffold(
-
       body: Padding(
         padding: PaddingUtilities.paddingRightLeft,
         child: Column(
@@ -73,9 +71,6 @@ class _MnemonicScreenState extends State<MnemonicScreen> {
                 print("buton çalıştı");
                 context.go('/login');
                 //await walletService.createAndStoreNewWallet();
-                
-                
-
               },
             ),
           ],
