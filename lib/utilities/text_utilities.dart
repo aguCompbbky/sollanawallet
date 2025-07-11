@@ -77,3 +77,24 @@ class TextSmallWigdet extends StatelessWidget {
     );
   }
 }
+
+
+class TextDrawerWigdet extends StatelessWidget {
+  const TextDrawerWigdet({
+    super.key, required this.text,required this.color,
+  });
+  final String text;
+  final Color color;
+
+  @override
+  Widget build(BuildContext context) {
+    return Text(
+      text, //text
+      style: Theme.of(context).textTheme.labelSmall?.copyWith(
+        fontSize: 14,
+        color: color
+      )
+      
+    );
+  }
+}

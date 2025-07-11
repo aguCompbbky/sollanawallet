@@ -79,6 +79,7 @@ class MyApp extends StatelessWidget {
       routerConfig: _router,
 
       theme: ThemeData(
+        
         textTheme: GoogleFonts.robotoTextTheme().copyWith(
           titleMedium: TextStyle(
             fontSize: TextUtilities.mediumTitleSize,

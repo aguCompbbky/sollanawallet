@@ -4,8 +4,10 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:walletsolana/bloc/wallet/wallet_bloc.dart';
 import 'package:walletsolana/bloc/wallet/wallet_event.dart';
 import 'package:walletsolana/bloc/wallet/wallet_state.dart';
+import 'package:walletsolana/screens/drawer_menu.dart';
 import 'package:walletsolana/services/wallet_services.dart';
 import 'package:walletsolana/utilities/form_utilities.dart';
+import 'package:walletsolana/utilities/image_utilities.dart';
 import 'package:walletsolana/utilities/padding_utilities.dart';
 import 'package:walletsolana/utilities/text_utilities.dart';
 
@@ -23,14 +25,26 @@ class _MainScreenState extends State<MainScreen> {
   Widget build(BuildContext context) {
     final screenSize = MediaQuery.of(context).size;
     const String assetPath = "assets/images/mainPageBackgroung.jpg";
-
+    var scaffoldKey = GlobalKey<ScaffoldState>(); // drawer için
     return BlocBuilder<WalletBloc, WalletState>(
       builder: (context, state) {
         return Scaffold(
-          resizeToAvoidBottomInset : false,
+          key: scaffoldKey,
+          resizeToAvoidBottomInset: false,
+          drawer: Drawer(child: DrawerMenu()),
+          extendBodyBehindAppBar: true,
+          appBar: AppBar(
+            backgroundColor: Colors.transparent,
+            elevation: 0,
+
+            leading: IconButton(
+              icon: Icon(Icons.density_medium),
+              onPressed: () => scaffoldKey.currentState?.openDrawer(),
+            ),
+          ),
           body: Container(
-            width: screenSize
-                .width, //arka plan resmi ekranı kaplasın diye böyle kullanmıştım
+            width: screenSize.width,
+            //arka plan resmi ekranı kaplasın diye böyle kullanmıştım
             height: screenSize.height,
             decoration: BoxDecoration(
               image: DecorationImage(
@@ -39,7 +53,7 @@ class _MainScreenState extends State<MainScreen> {
               ),
             ),
             child: Padding(
-              padding: PaddingUtilities.paddingTop*3,
+              padding: PaddingUtilities.paddingTop * 3,
               child: SingleChildScrollView(
                 child: Column(
                   children: [
@@ -50,7 +64,8 @@ class _MainScreenState extends State<MainScreen> {
                     SizedBox(height: 24),
                     _SearchBarWidget(),
                     PublicKey(),
-                    _PhantomWidget(), 
+                    _PhantomWidget(),
+                    Card(),
                   ],
                 ),
               ),
@@ -76,7 +91,6 @@ class _SearchBarWidget extends StatelessWidget {
 class _PhantomWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    const String phontomImage = "assets/images/phantom.png";
     return IconButton(
       onPressed: () async {
         print("buton phantom");
@@ -84,7 +98,7 @@ class _PhantomWidget extends StatelessWidget {
           ConnectPhantomEvent(authToken: '', publicKey: null),
         );
       },
-      icon: Image.asset(phontomImage),
+      icon: Image.asset(ImageUtilities.phontomImage),
     );
   }
 }
