@@ -11,10 +11,9 @@ import 'package:walletsolana/screens/main_screen.dart';
 import 'package:walletsolana/screens/mnemonic_screen.dart';
 import 'package:walletsolana/screens/register_screen.dart';
 import 'package:walletsolana/screens/start_screen.dart';
+import 'package:walletsolana/screens/transfer_screen.dart';
 import 'package:walletsolana/services/wallet_services.dart';
 import 'package:walletsolana/utilities/text_utilities.dart';
-
-
 
 final walletService = WalletService();
 
@@ -37,7 +36,7 @@ final GoRouter _router = GoRouter(
     GoRoute(
       path: '/',
       builder: (BuildContext context, GoRouterState state) {
-        return const StartScreen();                                //
+        return const StartScreen(); //
       },
       routes: <RouteBase>[
         GoRoute(
@@ -64,7 +63,12 @@ final GoRouter _router = GoRouter(
             return const MnemonicScreen();
           },
         ),
-
+        GoRoute(
+          path: 'transfer',
+          builder: (BuildContext context, GoRouterState state) {
+            return const TransferScreen();
+          },
+        ),
       ],
     ),
   ],
@@ -75,18 +79,20 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(create:(context) => WalletBloc(), child:  MaterialApp.router(
-      routerConfig: _router,
+    return BlocProvider(
+      create: (context) => WalletBloc(walletService),
+      child: MaterialApp.router(
+        routerConfig: _router,
 
-      theme: ThemeData(
-        
-        textTheme: GoogleFonts.robotoTextTheme().copyWith(
-          titleMedium: TextStyle(
-            fontSize: TextUtilities.mediumTitleSize,
-            fontWeight: FontWeight.bold,
+        theme: ThemeData(
+          textTheme: GoogleFonts.robotoTextTheme().copyWith(
+            titleMedium: TextStyle(
+              fontSize: TextUtilities.mediumTitleSize,
+              fontWeight: FontWeight.bold,
+            ),
           ),
         ),
       ),
-    ),);
+    );
   }
 }

@@ -7,11 +7,9 @@ import 'package:firebase_storage/firebase_storage.dart';
 
 class PpService {
   //bu kısım profil fotoğrafı eklemek için
-  Uint8List? _image;
+
   FirebaseAuth auth = FirebaseAuth.instance;
   final FirebaseFirestore photoSaver = FirebaseFirestore.instance;
-  
-
 
   pickImage(ImageSource source) async {
     final _imgPicker = ImagePicker();
@@ -20,51 +18,36 @@ class PpService {
     if (_file != null) {
       return await _file.readAsBytes();
     }
-    }
-    
-
-    Future<void> selectImage() async {
-      Uint8List img = await pickImage(ImageSource.gallery);
-      _image = img; //set state page idi normalde
-    }
-
-
-
-
-
-Future<void> savePhotos() async { //chat
-  if (_image == null) {
-    print("No image selected");
-    return;
   }
 
-  try {
-    // 1. Giriş yapan kullanıcının uid'sini al
-    String uid = FirebaseAuth.instance.currentUser!.uid;
+  Future<String> savePhotos(Uint8List imageBytes) async {
+    print("savePhotos CALLED");
 
-    // 2. Storage referansı oluştur
-    Reference ref = FirebaseStorage.instance
-        .ref()
-        .child('profilePics')
-        .child('$uid.jpg');
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) {
+      print("❌ Kullanıcı giriş yapmamış!");
+      throw Exception("Firebase user is null — Giriş yapılmamış olabilir.");
+    }
+    final uid = user.uid;
+    print("✅ UID: $uid");
 
-    // 3. Fotoğrafı yükle
-    UploadTask uploadTask = ref.putData(_image!);
+    Reference ref = FirebaseStorage.instance.ref().child(
+      'profilePics/$uid.jpg',
+    );
+    print("📤 Hazırlanıyor: Dosya yolu tamam");
+
+    UploadTask uploadTask = ref.putData(imageBytes);
+    print("📤 putData başladı");
     TaskSnapshot snapshot = await uploadTask;
-
-    // 4. Download URL'sini al
+    print("✅ Yükleme bitti");
     String downloadUrl = await snapshot.ref.getDownloadURL();
+    print("✅ URL alındı: $downloadUrl");
+    await FirebaseFirestore.instance
+        .collection('users')
+        .doc(uid.toString())
+        .update({'profilePic': downloadUrl});
+    print("✅ Firestore'a kayıt edildi");
 
-    // 5. Firestore'a URL'yi kaydet
-    await photoSaver.collection('users').doc(uid).update({
-      'profilePic': downloadUrl,
-    });
-
-    print("SUCCESFUL.");
-  } catch (e) {
-    print("ERROR: $e");
+    return downloadUrl;
   }
-}
-
-  
 }

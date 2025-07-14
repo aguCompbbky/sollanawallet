@@ -2,7 +2,19 @@ abstract class ProfileState {}
 
 class InitialStateProfile extends ProfileState{}
 
-class LoadingState extends ProfileState{}
+class SuccessfulState extends ProfileState{
+  final String photoUrl;
 
-class SuccessfulState extends ProfileState{}
+  SuccessfulState({required this.photoUrl});
+
+  @override
+  List<Object?> get props => [photoUrl];
+}
+
+class ErrorPhotoState extends ProfileState{
+  final String error;
+  ErrorPhotoState({required this.error});
+  
+
+}
 

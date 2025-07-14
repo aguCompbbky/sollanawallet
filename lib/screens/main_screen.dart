@@ -113,6 +113,7 @@ class PublicKey extends StatelessWidget {
         String? pk;
 
         if (state is GetPKState) {
+          //print("GetPKState'den gelen PK: ${state.pk}");
           pk = state.pk;
         }
 

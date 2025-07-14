@@ -1,16 +1,22 @@
 // 12 kelimelik mnemonic (seed phrase) üretir
 
 
+import 'dart:typed_data';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:solana/solana.dart';
 import 'package:bip39/bip39.dart' as bip39;
+import 'package:solana/src/rpc/dto/balance.dart';
+import 'package:solana_mobile_client/solana_mobile_client.dart';
 
 
 
 class WalletService {
+  
 
-  String? publicKey;
+
+  Uint8List? publicKey;
 
   final user = FirebaseAuth.instance.currentUser;
 
@@ -63,13 +69,85 @@ Future<String?> getAddress(String? email) async {
     return await secureStorage.read(key: 'mnemonic');
   }
 
+  Future<int> getSolBalance(String publicKey) async {
+  final client = SolanaClient(
+    rpcUrl: Uri.parse('https://api.devnet.solana.com'),//zaman aşımını çözüldü alchemy endpointi ile
+    websocketUrl: Uri.parse('wss://api.devnet.solana.com'),
+  );
+try {
+  final lamports = await client.rpcClient.getBalance(publicKey);
+  print(publicKey.length);
+  return lamports.value;  
+} catch (e) {
+    print("getBalance hatası: $e");
+    rethrow;
+}
+  //solananın milyonda biri demektir lamports
+}
+
+
+//Phantom işlemleri
+
+//Solana Mobile Client bir cubit yapısı kullanan bir şey olduğundan onu direkt UI da kullanmalıyım
+  SolanaClient? solanaClient;
+  void setupSolanaClient({bool isMainnet = false}) {
+    solanaClient = SolanaClient(
+      rpcUrl: Uri.parse(
+        isMainnet
+            ? 'https://api.mainnet-beta.solana.com'
+            : 'https://api.testnet.solana.com',
+      ),
+      websocketUrl: Uri.parse(
+        isMainnet
+            ? 'wss://api.mainnet-beta.solana.com'
+            : 'wss://api.testnet.solana.com',
+      ),
+    );
+    print("fonksiyon1");
+  }
+
+  Future<void> authorizeWallet(String? authToken, Uint8List? publicKey) async {
+    final session = await LocalAssociationScenario.create();
+    await session.startActivityForResult(null);
+
+    final client = await session.start();
+    final result = await client.authorize(
+      identityUri: Uri.parse('http://localhost'),
+      identityName: 'Your Dapp Name',
+      cluster: 'devnet', // or 'mainnet-beta'
+    );
+    if (result != null) {
+      authToken = result.authToken;
+      publicKey = result.publicKey;
+    }
+    print("object");
+    await session.close();
+  }
+
+
+
+//Solanaları cüzdana testde kullanmaya eklemek için
+Future<void> requestAirdrop(String address) async {
+  final client = SolanaClient(
+    rpcUrl: Uri.parse('https://api.devnet.solana.com'),
+    websocketUrl: Uri.parse('wss://api.devnet.solana.com'),
+  );
+
+  try {
+    final pubkey = Ed25519HDPublicKey.fromBase58(address);
+    final result = await client.rpcClient.requestAirdrop(pubkey.toString(), lamportsPerSol);
+    print("✅ Airdrop başarıyla gönderildi: $result");
+  } catch (e) {
+    print("❌ Airdrop hatası: $e");
+  }
+
 
 }
 
 
 
 
-
+}
 
 
 
