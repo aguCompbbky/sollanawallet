@@ -1,7 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:solana/solana.dart';
 import 'package:walletsolana/bloc/wallet/wallet_event.dart';
 import 'package:walletsolana/bloc/wallet/wallet_state.dart';
 import 'package:walletsolana/services/wallet_services.dart';
