@@ -2,6 +2,7 @@
 
 import 'dart:typed_data';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:solana/solana.dart';
@@ -30,13 +31,75 @@ class WalletService {
     );
   }
 
+  Future<void> initWalletForUser(String email) async {
+  // Eğer localde mnemonic yoksa Firebase'den al
+  String? localMnemonic = await secureStorage.read(key: 'mnemonic');
+
+  if (localMnemonic == null) {
+    // Firestore'dan kullanıcının mnemonic bilgisini al
+    final snapshot = await FirebaseFirestore.instance
+        .collection('users')
+        .doc(user?.uid)
+        .get();
+
+    if (snapshot.exists) {
+      final firebaseMnemonic = snapshot.data()?['mnemonic'];
+      if (firebaseMnemonic != null) {
+        await secureStorage.write(key: 'mnemonic', value: firebaseMnemonic);
+        print("Mnemonic Firebase'den alındı ve localde saklandı.");
+      } else {
+        print("Firebase'de mnemonic bulunamadı.");
+      }
+    } else {
+      print("Kullanıcı dökümanı bulunamadı.");
+    }
+  } else {
+    print("Mnemonic zaten localde kayıtlı.");
+  }
+}
+
+
   // Storage'dan mnemonic'i okuyarak cüzdanı geri yükle
-  Future<Ed25519HDKeyPair?> loadWallet() async {
-    final mnemonic = await secureStorage.read(key: 'mnemonic');
-    if (mnemonic == null) return null;
-    return createWalletFromMnemonic(mnemonic);
+Future<Ed25519HDKeyPair?> loadWallet() async {
+  final user = FirebaseAuth.instance.currentUser;
+  if (user == null) {
+    print("Kullanıcı oturum açmamış.");
+    return null;
   }
 
+  final snapshot = await FirebaseFirestore.instance
+      .collection('Users') 
+      .doc(user.uid)
+      .get();
+
+  if (!snapshot.exists) {
+    print("❌ Firestore'da kullanıcı dökümanı bulunamadı  ${user.uid}");
+    return null;
+  }
+
+  final mnemonic = snapshot.data()?['mnemonic'];
+  if (mnemonic == null) {
+    print("❌ mnemonic alanı boş.");
+    return null;
+  }
+
+  final seed = bip39.mnemonicToSeed(mnemonic);
+  final wallet = await Ed25519HDKeyPair.fromSeedWithHdPath(
+    seed: seed,
+    hdPath: "m/44'/501'/0'/0'", // ✅ Aynı path'i kullan!
+  );
+
+  print("✅ Wallet yüklendi: ${wallet.publicKey.toBase58()}");
+  return wallet;
+}
+
+
+
+
+
+
+
+//////////////////////////////////////////////////////
   Future<String?> getAddress(String? email) async {
     final String key = 'address_${email!.toLowerCase()}';
     return await secureStorage.read(key: key);
@@ -121,44 +184,81 @@ class WalletService {
     }
   }
 
-  Future<void> transferSOL({
-    required String reciverPubKey,
-    required int lamports,
-    required Ed25519HDKeyPair sender,
-  }) async {
-    try {
-      // Mnemonic'i al
-      final mnemonic = await getMnemonic();
-      if (mnemonic == null) {
-        throw Exception("Mnemonic not found.");
-      }
+Future<void> transferSOL({
+  required String reciverPubKey,
+  required int lamports,
+  required Ed25519HDKeyPair sender,
+}) async {
+  try {
+    final receiver = Ed25519HDPublicKey.fromBase58(reciverPubKey);
 
+    final client = SolanaClient(
+      rpcUrl: Uri.parse("https://api.devnet.solana.com"),
+      websocketUrl: Uri.parse("wss://api.devnet.solana.com"),
+    );
 
-      // Alıcı public key
-      final receiver = Ed25519HDPublicKey.fromBase58(reciverPubKey);
+    print("🔐 Sender PK: ${sender.publicKey.toBase58()}");
+    print("🎯 Receiver PK: $reciverPubKey");
+    print("💸 Amount: $lamports lamports");
 
-      // Solana client
-      final client = SolanaClient(
-        rpcUrl: Uri.parse("https://api.devnet.solana.com"),
-        websocketUrl: Uri.parse("wss://api.devnet.solana.com"),
-      );
-
-      // İşlem oluştur ve imzala/gönder
-      final signature = await client.rpcClient.signAndSendTransaction(
-        Message.only(
-          SystemInstruction.transfer(
-            fundingAccount: sender.publicKey,
-            recipientAccount: receiver,
-            lamports: lamports,
-          ),
+    final result = await client.sendAndConfirmTransaction(
+      commitment: Commitment.confirmed,
+      message: Message.only(
+        SystemInstruction.transfer(
+          fundingAccount: sender.publicKey,
+          recipientAccount: receiver,
+          lamports: lamports,
         ),
-        [sender],
-      );
+      ),
+      signers: [sender],
+    );
 
-      print("✅ Transfer successful. Signature: $signature");
-    } catch (e) {
-      print("❌ Transfer failed: $e");
-      rethrow;
-    }
+    print("✅ Transaction successful: $result");
+  } catch (e) {
+    print("❌ Transfer failed: $e");
+    rethrow;
   }
+}
+
+
+  // Future<void> transferSOL({
+  //   required String reciverPubKey,
+  //   required int lamports,
+  //   required Ed25519HDKeyPair sender,
+  // }) async {
+  //   try {
+  //     // Mnemonic'i al
+  //     final mnemonic = await getMnemonic();
+  //     if (mnemonic == null) {
+  //       throw Exception("Mnemonic not found.");
+  //     }
+
+
+  //     // Alıcı public key
+  //     final receiver = Ed25519HDPublicKey.fromBase58(reciverPubKey);
+
+  //     // Solana client
+  //     final client = SolanaClient(
+  //       rpcUrl: Uri.parse("https://api.devnet.solana.com"),
+  //       websocketUrl: Uri.parse("wss://api.devnet.solana.com"),
+  //     );
+
+  //     // İşlem oluştur ve imzala/gönder
+  //     final signature = await client.rpcClient.signAndSendTransaction(
+  //       Message.only(
+  //         SystemInstruction.transfer(
+  //           fundingAccount: sender.publicKey,
+  //           recipientAccount: receiver,
+  //           lamports: lamports,
+  //         ),
+  //       ),
+  //       [sender],
+  //     );
+
+  //     print("✅ Transfer successful. Signature: $signature");
+  //   } catch (e) {
+  //     print("❌ Transfer failed: $e");
+  //     rethrow;
+  //   }
+  // }
 }

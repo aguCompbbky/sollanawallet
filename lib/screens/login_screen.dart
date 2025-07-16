@@ -6,6 +6,7 @@ import 'package:walletsolana/bloc/auth/auth_bloc.dart';
 import 'package:walletsolana/bloc/auth/auth_event.dart';
 import 'package:walletsolana/bloc/auth/auth_state.dart';
 import 'package:walletsolana/services/firestore_service.dart';
+import 'package:walletsolana/services/wallet_services.dart';
 import 'package:walletsolana/utilities/button_utilities.dart';
 import 'package:walletsolana/utilities/color_utilities.dart';
 import 'package:walletsolana/utilities/form_utilities.dart';
@@ -21,14 +22,17 @@ class LogInScreen extends StatefulWidget {
 
 class _LogInScreenState extends State<LogInScreen> {
   final emailController = TextEditingController(text: "galaksilife8@gmail.com");
-  final passwordController = TextEditingController(text:"123456" );
+  final passwordController = TextEditingController(text: "123456");
+  WalletService walletService =
+      WalletService(); // geçici olarak bussinessdan çekildi
 
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (context) => AuthBloc(FireStoreService()),
       child: Scaffold(
-        resizeToAvoidBottomInset: false, //klavyenin taşıp bottom overflow olmasını engelliyor.
+        resizeToAvoidBottomInset:
+            false, //klavyenin taşıp bottom overflow olmasını engelliyor.
         appBar: AppBar(),
         body: Center(
           child: Column(
@@ -78,9 +82,10 @@ class _LogInScreenState extends State<LogInScreen> {
               ),
 
               BlocConsumer<AuthBloc, AuthState>(
-                listener: (context, state) {
+                listener: (context, state) async {
                   if (state is LoginedState) {
                     context.go("/main");
+                    await walletService.initWalletForUser(state.email);
                     print(state);
                   } else if (state is LoginErrorState) {
                     Fluttertoast.showToast(msg: "Invalid account informations");

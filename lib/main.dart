@@ -69,7 +69,7 @@ final GoRouter _router = GoRouter(
   path: 'transfer',
   builder: (BuildContext context, GoRouterState state) {
     final pk = state.extra as Map<String, dynamic>;
-    return TransferScreen(pk:pk["p"]);
+    return TransferScreen(pk:pk['q']);
 },
 ),
       ],

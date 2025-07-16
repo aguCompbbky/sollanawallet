@@ -16,7 +16,6 @@ WalletService walletService = WalletService();
 class TransferScreen extends StatefulWidget {
   final String? pk;
   const TransferScreen({super.key, required this.pk});
-  
 
   @override
   State<TransferScreen> createState() => _TransferScreenState();
@@ -25,10 +24,12 @@ class TransferScreen extends StatefulWidget {
 class _TransferScreenState extends State<TransferScreen> {
   @override
   void initState() {
-    print(widget.pk.toString());
     super.initState();
     context.read<WalletBloc>().add(ShowPKEvent());
-    context.read<WalletBloc>().add(GetSolBalanceEvent(publicKey: widget.pk ??""));
+    context.read<WalletBloc>().add(
+      GetSolBalanceEvent(publicKey: widget.pk ?? ""),
+    );
+    print("initsTAte" + widget.pk.toString()); 
   }
 
   String? balance;
@@ -36,67 +37,68 @@ class _TransferScreenState extends State<TransferScreen> {
   final amountController = TextEditingController();
   @override
   Widget build(BuildContext context) {
-    
-
-      return Scaffold(
-        appBar: AppBar(
-          leading: IconButton(
-            onPressed: () {
-              context.go("/main");
-            },
-            icon: Icon(Icons.arrow_back),
-          ),
+    return Scaffold(
+      appBar: AppBar(
+        leading: IconButton(
+          onPressed: () {
+            context.go("/main");
+          },
+          icon: Icon(Icons.arrow_back),
         ),
-        body: Center(
-          child: Expanded(
-            child: Column(
-              children: [
-                BalanceWidget(balance ?? "999"),
-                Spacer(),
-                Padding(
-                  padding: PaddingUtilities.paddingRightLeft,
-                  child: Column(
-                    children: [
-                      EmailFormWidget(
-                        text: 'Write the target address',
-                        controller: addressController,
-                      ),
-                      SizedBox(height: 70),
-                      Padding(
-                        padding: PaddingUtilities.paddingRightLeft * 5,
-                        child: EmailFormWidget(
-                          text: "Enter the amount",
-                          controller: amountController,
+      ),
+      body: Center(
+        child: Column(
+          children: [
+            Expanded(
+              child: Column(
+                children: [
+                  BalanceWidget(balance ?? "999"),
+                  Spacer(),
+                  Padding(
+                    padding: PaddingUtilities.paddingRightLeft,
+                    child: Column(
+                      children: [
+                        EmailFormWidget(
+                          text: 'Write the target address',
+                          controller: addressController,
                         ),
-                      ),
-                    ],
+                        SizedBox(height: 70),
+                        Padding(
+                          padding: PaddingUtilities.paddingRightLeft * 5,
+                          child: EmailFormWidget(
+                            text: "Enter the amount",
+                            controller: amountController,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
-                ),
-                const Spacer(),
-                BlocBuilder<WalletBloc, WalletState>(
-                  builder: (context, state) {
-                    return Padding(
-                      padding: PaddingUtilities.paddingTopBottom,
-                      child: ButtonWidget(
-                        buttonBackgroundColor:
-                            ColorUtilities.buttonBackgroundColor,
-                        text: "send",
-                        onpressed: _transfer
-                      ),
-                    );
-                  },
-                ),
-              ],
+                  const Spacer(),
+                  BlocBuilder<WalletBloc, WalletState>(
+                    builder: (context, state) {
+                      return Padding(
+                        padding: PaddingUtilities.paddingTopBottom,
+                        child: ButtonWidget(
+                          buttonBackgroundColor:
+                              ColorUtilities.buttonBackgroundColor,
+                          text: "send",
+                          onpressed: _transfer,
+                        ),
+                      );
+                    },
+                  ),
+                ],
+              ),
             ),
-          ),
+          ],
         ),
-      
+      ),
     );
   }
 
   void _transfer() {
     final receiver = addressController.text.trim();
-    final solana = double.tryParse(amountController.text.trim());//1
+    final solana = double.tryParse(amountController.text.trim()); //1
 
     if (receiver.isEmpty || solana == null || solana <= 0) {
       print("para yok");
@@ -108,7 +110,7 @@ class _TransferScreenState extends State<TransferScreen> {
     if (state is GetSolBalanceState) {
       final sender = state.publicKey;
 
-      final lamportAmount = (solana * 1000000000).round();//lamporta cevir
+      final lamportAmount = (solana * 1000000000).round(); //lamporta cevir
 
       context.read<WalletBloc>().add(
         TransferSOLEvent(
@@ -121,10 +123,6 @@ class _TransferScreenState extends State<TransferScreen> {
       print("Public key not loaded yet.");
     }
   }
-
-
-
-
 }
 
 class BalanceWidget extends StatelessWidget {
@@ -172,6 +170,4 @@ class BalanceWidget extends StatelessWidget {
       ),
     );
   }
-
-
 }

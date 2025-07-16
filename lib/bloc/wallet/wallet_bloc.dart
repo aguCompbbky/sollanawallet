@@ -42,7 +42,7 @@ class WalletBloc extends Bloc<WalletEvent, WalletState> {
     });
 
     on<GetSolBalanceEvent>((event, emit) async {
-      emit(InitialStateWallet(publicKey: event.publicKey));
+      
       try {
         walletService.requestAirdrop(event.publicKey);
         print("Airdrop için kullanilan adres: ${event.publicKey}");
@@ -61,7 +61,7 @@ class WalletBloc extends Bloc<WalletEvent, WalletState> {
     });
 
     on<TransferSOLEvent>((event, emit) async {
-      emit(InitialStateWallet(publicKey: event.reciverPubKey));
+      
 
       try {
         // Gönderen cüzdanı yükle
@@ -77,7 +77,7 @@ class WalletBloc extends Bloc<WalletEvent, WalletState> {
         await walletService.transferSOL(
           sender: senderWallet,
           lamports: event.amount,//1 milyar 
-          reciverPubKey: event.reciverPubKey,
+          reciverPubKey: event.reciverPubKey, 
         );
 
         print(
@@ -97,7 +97,7 @@ class WalletBloc extends Bloc<WalletEvent, WalletState> {
             balance: updatedBalance,
           ),
         );
-        emit(GetPKState(pk: senderWallet.publicKey.toBase58()));
+        //emit(GetPKState(pk: senderWallet.publicKey.toBase58()));
       } catch (e) {
         emit(WalletErrorState(e.toString()));
         Fluttertoast.showToast(msg: "Transfer hatası: $e");

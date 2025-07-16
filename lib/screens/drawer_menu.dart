@@ -43,13 +43,11 @@ class MenuItems extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     const String pp = "assets/images/pp.png";
-     String? pk;
-    return BlocConsumer<WalletBloc, WalletState>(
-      listener: (context, state) {
-        // TODO: implement listener
-      },
+    String? pk;
+    return BlocBuilder<WalletBloc, WalletState>(
+
       builder: (context, state) {
-             if (state is GetPKState) {
+        if (state is GetPKState) {
           //print("GetPKState'den gelen PK: ${state.pk}");
           pk = state.pk;
         }
@@ -59,20 +57,23 @@ class MenuItems extends StatelessWidget {
               text: TextUtilities.solidium,
               color: Colors.deepPurple,
             ),
-    
+
             _PPWidget(pp: pp),
-    
+
             Align(
               alignment: Alignment.topLeft,
               child: Padding(
                 padding: PaddingUtilities.paddingLeft,
-                child: TitleMediumWigdet(text: "Name Surname", color: Colors.black),
+                child: TitleMediumWigdet(
+                  text: "Name Surname",
+                  color: Colors.black,
+                ),
               ),
             ),
-    
+
             _ViewProfileTextWidget(),
             Divider(),
-    
+
             ListTile(
               leading: DrawerIconWidget(image: ImageUtilities.phontomImage),
               title: TextDrawerWigdet(
@@ -85,7 +86,7 @@ class MenuItems extends StatelessWidget {
                 );
               },
             ),
-    
+
             ListTile(
               leading: DrawerIconWidget(image: ImageUtilities.iconSolflare),
               title: TextDrawerWigdet(
@@ -94,22 +95,23 @@ class MenuItems extends StatelessWidget {
               ),
               onTap: () {},
             ),
-    
+
             ListTile(
               leading: DrawerIconWidget(image: ImageUtilities.iconNFTImage),
               title: TextDrawerWigdet(text: "My NFT's", color: Colors.black),
               onTap: () {},
             ),
-    
+
             ListTile(
               leading: DrawerIconWidget(image: ImageUtilities.iconExplore),
               title: TextDrawerWigdet(text: "Transfer", color: Colors.black),
               onTap: () {
-    context.go("/transfer", extra: {'q': pk});          },
+                context.go("/transfer", extra: {'q': pk});
+              },
             ),
-    
+
             Divider(),
-    
+
             Align(
               alignment: Alignment.bottomRight,
               child: TextButton(onPressed: () {}, child: Text("log out")),
@@ -140,11 +142,10 @@ class _PPWidget extends StatelessWidget {
               String? profileUrl;
               if (state is SuccessfulState) {
                 profileUrl = state.photoUrl;
-                
               }
               return IconButton(
                 onPressed: () async {
-                  print("statee"+state.toString());
+                  print("statee" + state.toString());
                   final picker = ImagePicker();
                   final XFile? image = await picker.pickImage(
                     source: ImageSource.gallery,
@@ -188,8 +189,6 @@ class DrawerIconWidget extends StatelessWidget {
 }
 
 class _ViewProfileTextWidget extends StatelessWidget {
-
-
   @override
   Widget build(BuildContext context) {
     return Align(

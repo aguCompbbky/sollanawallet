@@ -33,7 +33,7 @@ class AuthBloc extends Bloc<AuthEvent,AuthState> {
       emit(LoadingState());
       try {
         await db.loginUser(email: event.email, password: event.password);
-        emit(LoginedState());
+        emit(LoginedState(email: event.email));
         
       } on FirebaseAuthException catch (e) {
         emit(LoginErrorState(e.toString()));
@@ -49,7 +49,7 @@ class AuthBloc extends Bloc<AuthEvent,AuthState> {
       emit(LoadingState());
       try {
         await db.loginWithGoogle();
-        emit(LoginedState());
+        emit(LoginedGoogleState());
         
       } on FirebaseAuthException catch (e) {
         emit(LoginErrorState(e.toString()));
