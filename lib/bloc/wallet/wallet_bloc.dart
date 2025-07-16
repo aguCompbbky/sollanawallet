@@ -1,5 +1,3 @@
-import 'dart:typed_data';
-
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -11,16 +9,13 @@ class WalletBloc extends Bloc<WalletEvent, WalletState> {
   WalletService walletService = WalletService();
   final user = FirebaseAuth.instance.currentUser;
 
-  WalletBloc(this.walletService) : super(InitialStateWallet(publicKey:"")) {
-
-
+  WalletBloc(this.walletService) : super(InitialStateWallet(publicKey: "")) {
     on<ShowPKEvent>((event, emit) async {
-
       try {
         String email = FirebaseAuth.instance.currentUser?.email ?? '';
         final pk = await walletService.getAddress(email);
-        
 
+ 
         emit(GetPKState(pk: pk));
       } catch (e) {
         emit(WalletErrorState(e.toString()));
@@ -34,7 +29,9 @@ class WalletBloc extends Bloc<WalletEvent, WalletState> {
       try {
         walletService.setupSolanaClient(isMainnet: false);
 
-        emit(PhantomWalletConnectedState(publicKey: event.publicKey.toString()));
+        emit(
+          PhantomWalletConnectedState(publicKey: event.publicKey.toString()),
+        );
 
         await walletService.authorizeWallet(event.authToken, event.publicKey);
       } catch (e) {
@@ -45,10 +42,8 @@ class WalletBloc extends Bloc<WalletEvent, WalletState> {
     });
 
     on<GetSolBalanceEvent>((event, emit) async {
-     
       emit(InitialStateWallet(publicKey: event.publicKey));
       try {
-       
         walletService.requestAirdrop(event.publicKey);
         print("Airdrop için kullanilan adres: ${event.publicKey}");
         await Future.delayed(const Duration(seconds: 2));
@@ -62,6 +57,51 @@ class WalletBloc extends Bloc<WalletEvent, WalletState> {
         emit(WalletErrorState(e.toString()));
         Fluttertoast.showToast(msg: e.toString());
         print(e.toString());
+      }
+    });
+
+    on<TransferSOLEvent>((event, emit) async {
+      emit(InitialStateWallet(publicKey: event.reciverPubKey));
+
+      try {
+        // Gönderen cüzdanı yükle
+        final senderWallet = await walletService.loadWallet();
+        if (senderWallet == null) {
+          throw Exception("Gönderen cüzdan bulunamadı.");
+        }
+
+        print("Transfer sender: ${event.senderPubKey}");
+        print("Transfer receiver: ${event.reciverPubKey}");
+
+        // Transfer işlemi
+        await walletService.transferSOL(
+          sender: senderWallet,
+          lamports: event.amount,//1 milyar 
+          reciverPubKey: event.reciverPubKey,
+        );
+
+        print(
+          "Transfer yapıldı: ${event.amount} lamports: ${event.reciverPubKey}",
+        );
+
+        // Yeni bakiyeyi çek
+        final updatedBalance = await walletService.getSolBalance(
+          senderWallet.publicKey.toBase58(),
+        );
+
+        // State güncelle
+        emit(TransferState(reciverPubKey: event.reciverPubKey));
+        emit(
+          GetSolBalanceState(
+            publicKey: senderWallet.publicKey.toBase58(),
+            balance: updatedBalance,
+          ),
+        );
+        emit(GetPKState(pk: senderWallet.publicKey.toBase58()));
+      } catch (e) {
+        emit(WalletErrorState(e.toString()));
+        Fluttertoast.showToast(msg: "Transfer hatası: $e");
+        print("Transfer hatası: $e");
       }
     });
   }

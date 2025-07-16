@@ -1,7 +1,5 @@
 
 
-import 'package:flutter/physics.dart';
-
 abstract class WalletState {
 final String publicKey;
 
@@ -40,4 +38,9 @@ class GetSolBalanceState extends WalletState {
   final String publicKey;
   final int balance;
   GetSolBalanceState({required this.publicKey,required this.balance}) : super(publicKey: publicKey);
+}
+
+class TransferState extends WalletState{
+  final String reciverPubKey;
+  TransferState({required this.reciverPubKey}) : super(publicKey: '');
 }

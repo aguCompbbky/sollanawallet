@@ -9,6 +9,7 @@ import 'package:walletsolana/bloc/profile/profile_event.dart';
 import 'package:walletsolana/bloc/profile/profile_state.dart';
 import 'package:walletsolana/bloc/wallet/wallet_bloc.dart';
 import 'package:walletsolana/bloc/wallet/wallet_event.dart';
+import 'package:walletsolana/bloc/wallet/wallet_state.dart';
 import 'package:walletsolana/services/pp_service.dart';
 import 'package:walletsolana/utilities/image_utilities.dart';
 import 'package:walletsolana/utilities/padding_utilities.dart';
@@ -42,68 +43,80 @@ class MenuItems extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     const String pp = "assets/images/pp.png";
-    return Column(
-      children: [
-        TitleLargeWigdet(
-          text: TextUtilities.solidium,
-          color: Colors.deepPurple,
-        ),
-
-        _PPWidget(pp: pp),
-
-        Align(
-          alignment: Alignment.topLeft,
-          child: Padding(
-            padding: PaddingUtilities.paddingLeft,
-            child: TitleMediumWigdet(text: "Name Surname", color: Colors.black),
-          ),
-        ),
-
-        _ViewProfileTextWidget(),
-        Divider(),
-
-        ListTile(
-          leading: DrawerIconWidget(image: ImageUtilities.phontomImage),
-          title: TextDrawerWigdet(
-            text: 'Connect With Phantom',
-            color: Colors.black,
-          ),
-          onTap: () {
-            context.read<WalletBloc>().add(
-              ConnectPhantomEvent(authToken: '', publicKey: null),
-            );
-          },
-        ),
-
-        ListTile(
-          leading: DrawerIconWidget(image: ImageUtilities.iconSolflare),
-          title: TextDrawerWigdet(
-            text: "Connect with Solflare",
-            color: Colors.black,
-          ),
-          onTap: () {},
-        ),
-
-        ListTile(
-          leading: DrawerIconWidget(image: ImageUtilities.iconNFTImage),
-          title: TextDrawerWigdet(text: "My NFT's", color: Colors.black),
-          onTap: () {},
-        ),
-
-        ListTile(
-          leading: DrawerIconWidget(image: ImageUtilities.iconExplore),
-          title: TextDrawerWigdet(text: "Transfer", color: Colors.black),
-          onTap: () {
-context.go("/transfer");          },
-        ),
-
-        Divider(),
-
-        Align(
-          alignment: Alignment.bottomRight,
-          child: TextButton(onPressed: () {}, child: Text("log out")),
-        ),
-      ],
+     String? pk;
+    return BlocConsumer<WalletBloc, WalletState>(
+      listener: (context, state) {
+        // TODO: implement listener
+      },
+      builder: (context, state) {
+             if (state is GetPKState) {
+          //print("GetPKState'den gelen PK: ${state.pk}");
+          pk = state.pk;
+        }
+        return Column(
+          children: [
+            TitleLargeWigdet(
+              text: TextUtilities.solidium,
+              color: Colors.deepPurple,
+            ),
+    
+            _PPWidget(pp: pp),
+    
+            Align(
+              alignment: Alignment.topLeft,
+              child: Padding(
+                padding: PaddingUtilities.paddingLeft,
+                child: TitleMediumWigdet(text: "Name Surname", color: Colors.black),
+              ),
+            ),
+    
+            _ViewProfileTextWidget(),
+            Divider(),
+    
+            ListTile(
+              leading: DrawerIconWidget(image: ImageUtilities.phontomImage),
+              title: TextDrawerWigdet(
+                text: 'Connect With Phantom',
+                color: Colors.black,
+              ),
+              onTap: () {
+                context.read<WalletBloc>().add(
+                  ConnectPhantomEvent(authToken: '', publicKey: null),
+                );
+              },
+            ),
+    
+            ListTile(
+              leading: DrawerIconWidget(image: ImageUtilities.iconSolflare),
+              title: TextDrawerWigdet(
+                text: "Connect with Solflare",
+                color: Colors.black,
+              ),
+              onTap: () {},
+            ),
+    
+            ListTile(
+              leading: DrawerIconWidget(image: ImageUtilities.iconNFTImage),
+              title: TextDrawerWigdet(text: "My NFT's", color: Colors.black),
+              onTap: () {},
+            ),
+    
+            ListTile(
+              leading: DrawerIconWidget(image: ImageUtilities.iconExplore),
+              title: TextDrawerWigdet(text: "Transfer", color: Colors.black),
+              onTap: () {
+    context.go("/transfer", extra: {'q': pk});          },
+            ),
+    
+            Divider(),
+    
+            Align(
+              alignment: Alignment.bottomRight,
+              child: TextButton(onPressed: () {}, child: Text("log out")),
+            ),
+          ],
+        );
+      },
     );
   }
 }
@@ -175,7 +188,7 @@ class DrawerIconWidget extends StatelessWidget {
 }
 
 class _ViewProfileTextWidget extends StatelessWidget {
-  const _ViewProfileTextWidget({super.key});
+
 
   @override
   Widget build(BuildContext context) {
