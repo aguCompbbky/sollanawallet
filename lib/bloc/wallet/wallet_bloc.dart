@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:solana/solana.dart';
 import 'package:walletsolana/bloc/wallet/wallet_event.dart';
 import 'package:walletsolana/bloc/wallet/wallet_state.dart';
 import 'package:walletsolana/services/wallet_services.dart';
@@ -28,12 +29,14 @@ class WalletBloc extends Bloc<WalletEvent, WalletState> {
       emit(InitialStateWallet(publicKey: event.publicKey.toString()));
       try {
         walletService.setupSolanaClient(isMainnet: false);
+        final phantomPublicKey = await walletService.authorizeWallet(event.authToken);
 
+         
         emit(
-          PhantomWalletConnectedState(publicKey: event.publicKey.toString()),
+          PhantomWalletConnectedState(publicKey: phantomPublicKey.toString()),
         );
 
-        await walletService.authorizeWallet(event.authToken, event.publicKey);
+        
       } catch (e) {
         emit(WalletErrorState(e.toString()));
         Fluttertoast.showToast(msg: e.toString());
@@ -67,7 +70,7 @@ class WalletBloc extends Bloc<WalletEvent, WalletState> {
         // Gönderen cüzdanı yükle
         final senderWallet = await walletService.loadWallet();
         if (senderWallet == null) {
-          throw Exception("Gönderen cüzdan bulunamadı.");
+          throw Exception("Gönderen cüzdan bulunmadi.");
         }
 
         print("Transfer sender: ${event.senderPubKey}");

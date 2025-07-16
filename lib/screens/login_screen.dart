@@ -83,7 +83,8 @@ class _LogInScreenState extends State<LogInScreen> {
 
               BlocConsumer<AuthBloc, AuthState>(
                 listener: (context, state) async {
-                  if (state is LoginedState) {
+                  if (state is LoginedGoogleState){context.go("/main");}
+                  else if (state is LoginedState ) {
                     context.go("/main");
                     await walletService.initWalletForUser(state.email);
                     print(state);

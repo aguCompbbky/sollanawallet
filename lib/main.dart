@@ -5,7 +5,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:walletsolana/bloc/wallet/wallet_bloc.dart';
-import 'package:walletsolana/bloc/wallet/wallet_state.dart';
 import 'package:walletsolana/firebase_options.dart';
 import 'package:walletsolana/screens/login_screen.dart';
 import 'package:walletsolana/screens/main_screen.dart';

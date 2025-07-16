@@ -90,6 +90,7 @@ class FireStoreService {
   }
 
   Future<bool> loginWithGoogle() async {
+    
     final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
 
 
@@ -104,37 +105,10 @@ class FireStoreService {
       thirdParty,
     ); //3rd party credentials facebook Google
 
+    //print("google user ${FirebaseAuth.instance.currentUser}");
+
     return FirebaseAuth.instance.currentUser != null;
   }
 
-  // Future<void> AddPublicKUser({
-  //   required UserCredential user,
-  //   required String publicKey,
-  // }) async {
-  //   final uid = user.user?.uid;
-  //   final email = user.user?.email;
 
-  //   if (uid == null || email == null) {
-  //     throw Exception("critical identies is null");
-  //   }
-
-  //   await db.doc(uid).set({
-  //     "uid": uid,
-  //     "email": email,
-  //     "publicKey": publicKey,
-  //     "createdAt": FieldValue.serverTimestamp(),
-  //   });
-  // }
-
-  // Future<void> _registerUser({required String name, required String email, required String username, required String password}) async {
-
-  //   await db.doc().set({
-  //     "name" : name,
-  //     "email" : email,
-  //     "username" : username,
-  //     "password" : password
-
-  //   });
-
-  // }
 }

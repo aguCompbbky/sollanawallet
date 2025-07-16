@@ -59,7 +59,7 @@ class WalletService {
 }
 
 
-  // Storage'dan mnemonic'i okuyarak cüzdanı geri yükle
+
 Future<Ed25519HDKeyPair?> loadWallet() async {
   final user = FirebaseAuth.instance.currentUser;
   if (user == null) {
@@ -73,23 +73,32 @@ Future<Ed25519HDKeyPair?> loadWallet() async {
       .get();
 
   if (!snapshot.exists) {
-    print("❌ Firestore'da kullanıcı dökümanı bulunamadı  ${user.uid}");
+    print("Firestoreda kullanıcı dökümanı bulunamadı  ${user.uid}");
     return null;
   }
 
   final mnemonic = snapshot.data()?['mnemonic'];
   if (mnemonic == null) {
-    print("❌ mnemonic alanı boş.");
+    print("mnemonic boş.");
     return null;
   }
+  //final wallet = await Ed25519HDKeyPair.fromMnemonic(mnemonic);
+  // //     final List<int> seed = bip39.mnemonicToSeed(mnemonic);
+
+  // //   return Ed25519HDKeyPair.fromSeedWithHdPath(
+  // //     seed: seed,
+  // //     hdPath: getHDPath(account, change),
+  // //   );
+  // // }
+ //fromMnemonic foksiynonu kendi içinde seede göre path atıyor bundan dolayı bunu kullanmak yerine path atamamız lazım
 
   final seed = bip39.mnemonicToSeed(mnemonic);
-  final wallet = await Ed25519HDKeyPair.fromSeedWithHdPath(
+  final wallet = await Ed25519HDKeyPair.fromSeedWithHdPath(//pathi vermezen privettan kendisi yeni publickey üretir
     seed: seed,
-    hdPath: "m/44'/501'/0'/0'", // ✅ Aynı path'i kullan!
+    hdPath: "m/44'/501'/0'/0'", 
   );
 
-  print("✅ Wallet yüklendi: ${wallet.publicKey.toBase58()}");
+  print("Wallet yüklendi: ${wallet.publicKey.toBase58()}");
   return wallet;
 }
 
@@ -113,7 +122,7 @@ Future<Ed25519HDKeyPair?> loadWallet() async {
     final client = SolanaClient(
       rpcUrl: Uri.parse(
         'https://api.devnet.solana.com',
-      ), //zaman aşımını çözüldü alchemy endpointi ile
+      ), 
       websocketUrl: Uri.parse('wss://api.devnet.solana.com'),
     );
     try {
@@ -147,7 +156,7 @@ Future<Ed25519HDKeyPair?> loadWallet() async {
     print("fonksiyon1");
   }
 
-  Future<void> authorizeWallet(String? authToken, Uint8List? publicKey) async {
+  Future<Uint8List?> authorizeWallet(String? authToken) async {
     final session = await LocalAssociationScenario.create();
     await session.startActivityForResult(null);
 
@@ -155,14 +164,16 @@ Future<Ed25519HDKeyPair?> loadWallet() async {
     final result = await client.authorize(
       identityUri: Uri.parse('http://localhost'),
       identityName: 'Your Dapp Name',
-      cluster: 'devnet', // or 'mainnet-beta'
+      cluster: 'devnet', 
     );
     if (result != null) {
       authToken = result.authToken;
       publicKey = result.publicKey;
+     
     }
     print("object");
     await session.close();
+    return publicKey;
   }
 
   //Solanaları cüzdana testde kullanmaya eklemek için

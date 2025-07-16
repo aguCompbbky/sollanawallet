@@ -30,8 +30,10 @@ class AuthBloc extends Bloc<AuthEvent,AuthState> {
     });
 
     on<LoginWithEmailEvent>((event, emit) async {
+      
       emit(LoadingState());
       try {
+         
         await db.loginUser(email: event.email, password: event.password);
         emit(LoginedState(email: event.email));
         
