@@ -8,7 +8,7 @@ import 'package:walletsolana/services/wallet_services.dart';
 
 class WalletBloc extends Bloc<WalletEvent, WalletState> {
   WalletService walletService = WalletService();
-  final user = FirebaseAuth.instance.currentUser;
+  
 
   WalletBloc(this.walletService) : super(InitialStateWallet(publicKey: "")) {
     on<ShowPKEvent>((event, emit) async {

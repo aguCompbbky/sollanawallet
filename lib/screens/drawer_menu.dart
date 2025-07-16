@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:walletsolana/bloc/auth/auth_bloc.dart';
+import 'package:walletsolana/bloc/auth/auth_state.dart';
 import 'package:walletsolana/bloc/profile/profile_bloc.dart';
 import 'package:walletsolana/bloc/profile/profile_event.dart';
 import 'package:walletsolana/bloc/profile/profile_state.dart';
@@ -45,7 +47,6 @@ class MenuItems extends StatelessWidget {
     const String pp = "assets/images/pp.png";
     String? pk;
     return BlocBuilder<WalletBloc, WalletState>(
-
       builder: (context, state) {
         if (state is GetPKState) {
           //print("GetPKState'den gelen PK: ${state.pk}");
@@ -65,7 +66,7 @@ class MenuItems extends StatelessWidget {
               child: Padding(
                 padding: PaddingUtilities.paddingLeft,
                 child: TitleMediumWigdet(
-                  text: "Name Surname",
+                  text: state.user!.email ?? "Name Surname",
                   color: Colors.black,
                 ),
               ),

@@ -1,7 +1,10 @@
 
 
+import 'package:firebase_auth/firebase_auth.dart';
+
 abstract class WalletState {
 final String publicKey;
+final user = FirebaseAuth.instance.currentUser;
 
   WalletState({required this.publicKey});
   
