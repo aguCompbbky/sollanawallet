@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:walletsolana/services/firestore_service.dart';
 import 'package:walletsolana/services/wallet_services.dart';
 import 'package:walletsolana/utilities/button_utilities.dart';
 import 'package:walletsolana/utilities/padding_utilities.dart';
@@ -13,7 +14,7 @@ class MnemonicScreen extends StatefulWidget {
 }
 
 class _MnemonicScreenState extends State<MnemonicScreen> {
-  final WalletService walletService = WalletService();
+  FireStoreService db = FireStoreService();
   String? mnemonic;
   List<String> words = [];
 
@@ -25,21 +26,17 @@ class _MnemonicScreenState extends State<MnemonicScreen> {
   }
 
   Future<void> _loadMnemonic() async {
-    final result = await walletService.generateMnemonic(); // bura silinecek
-    setState(() {
+    final result = await db.getMnemonicFromFirebase();
+    setState((){
       mnemonic = result;
-      words = result.split(' ');
+      words = mnemonic!.split(' ');
        
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    // if (mnemonic == null) {
-    //   return const Scaffold(
-    //     body: Center(child: CircularProgressIndicator()),
-    //   );
-    // }
+
 
     return Scaffold(
       body: Padding(

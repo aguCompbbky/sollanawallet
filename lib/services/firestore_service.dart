@@ -68,12 +68,13 @@ class FireStoreService {
         final userDoc = await FirebaseFirestore.instance
             .collection("Users")
             .doc(uid)
-            .get();   //firebasedan publik keyi çekiyoruz
+            .get(); //firebasedan publik keyi çekiyoruz
 
         final publicKey = userDoc.data()?['publicKey'];
 
         if (publicKey != null) {
-          await walletService.secureStorage.write( //ardından secureStrorage ye yazıyoz ki get fonksiyonunu bununla yazmıştık baştan yazmayalım
+          await walletService.secureStorage.write(
+            //ardından secureStrorage ye yazıyoz ki get fonksiyonunu bununla yazmıştık baştan yazmayalım
             key: 'address_${email.toLowerCase()}',
             value: publicKey,
           );
@@ -83,16 +84,13 @@ class FireStoreService {
         Fluttertoast.showToast(msg: "Login successful ");
       }
     } on FirebaseAuthException catch (e) {
-      
       Fluttertoast.showToast(msg: e.message!);
       throw e;
     }
   }
 
   Future<bool> loginWithGoogle() async {
-    
     final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
-
 
     GoogleSignInAuthentication userAuth = await googleUser!.authentication;
 
@@ -110,5 +108,26 @@ class FireStoreService {
     return FirebaseAuth.instance.currentUser != null;
   }
 
+  Future<String> getMnemonicFromFirebase() async {
 
+    try {
+      final user = FirebaseAuth.instance.currentUser;
+      final db = FirebaseFirestore.instance;
+      final snapshot = await db.collection("Users").doc(user!.uid).get();
+
+    if (snapshot.exists) {
+      var mnemonic = snapshot['mnemonic'];
+      print('Mnemonic: $mnemonic');
+      return mnemonic;
+    } else {
+      print('Mnemonic bulunamadı');
+      return "Mnemonic bulunamadı";
+    }
+      
+    } catch (e) {
+      print('Hata: $e');
+      return(e.toString());
+    }
+    
+  }
 }
