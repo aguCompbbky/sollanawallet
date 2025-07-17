@@ -4,6 +4,7 @@ import 'package:walletsolana/utilities/button_utilities.dart';
 import 'package:walletsolana/utilities/padding_utilities.dart';
 import 'package:go_router/go_router.dart';
 
+
 class MnemonicScreen extends StatefulWidget {
   const MnemonicScreen({super.key});
 
@@ -24,10 +25,11 @@ class _MnemonicScreenState extends State<MnemonicScreen> {
   }
 
   Future<void> _loadMnemonic() async {
-    final result = await walletService.generateMnemonic();
+    final result = await walletService.generateMnemonic(); // bura silinecek
     setState(() {
       mnemonic = result;
       words = result.split(' ');
+       
     });
   }
 
