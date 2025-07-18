@@ -2,17 +2,21 @@
 
 import 'dart:typed_data';
 
+import 'package:encrypt/encrypt.dart' as encrypt;
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:solana/solana.dart';
 import 'package:bip39/bip39.dart' as bip39;
 import 'package:solana_mobile_client/solana_mobile_client.dart';
+import 'package:walletsolana/services/encryption_service.dart';
 
 class WalletService {
   Uint8List? publicKey;
 
   final user = FirebaseAuth.instance.currentUser;
+
+  final EncryptionService encryptionService = EncryptionService();
 
   final secureStorage = const FlutterSecureStorage();
 
@@ -82,6 +86,9 @@ Future<Ed25519HDKeyPair?> loadWallet() async {
     print("mnemonic boş.");
     return null;
   }
+  final encrypted = encrypt.Encrypted.fromBase64(mnemonic);
+  final decryptedMnemonic = encryptionService.decryptMnemonic(encrypted);
+
   //final wallet = await Ed25519HDKeyPair.fromMnemonic(mnemonic);
   // //     final List<int> seed = bip39.mnemonicToSeed(mnemonic);
 
@@ -92,7 +99,7 @@ Future<Ed25519HDKeyPair?> loadWallet() async {
   // // }
  //fromMnemonic foksiynonu kendi içinde seede göre path atıyor bundan dolayı bunu kullanmak yerine path atamamız lazım
 
-  final seed = bip39.mnemonicToSeed(mnemonic);
+  final seed = bip39.mnemonicToSeed(decryptedMnemonic);
   final wallet = await Ed25519HDKeyPair.fromSeedWithHdPath(//pathi vermezen privettan kendisi yeni publickey üretir
     seed: seed,
     hdPath: "m/44'/501'/0'/0'", 

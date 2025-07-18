@@ -1,6 +1,8 @@
+
+import 'package:encrypt/encrypt.dart' as encrypt;
 import 'package:flutter/material.dart';
+import 'package:walletsolana/services/encryption_service.dart';
 import 'package:walletsolana/services/firestore_service.dart';
-import 'package:walletsolana/services/wallet_services.dart';
 import 'package:walletsolana/utilities/button_utilities.dart';
 import 'package:walletsolana/utilities/padding_utilities.dart';
 import 'package:go_router/go_router.dart';
@@ -15,18 +17,23 @@ class MnemonicScreen extends StatefulWidget {
 
 class _MnemonicScreenState extends State<MnemonicScreen> {
   FireStoreService db = FireStoreService();
+
   String? mnemonic;
   List<String> words = [];
+  EncryptionService encryptionService = EncryptionService();
 
   @override
   void initState() {
+    
     print("sayfaya girdi");
     super.initState();
     _loadMnemonic();
   }
 
   Future<void> _loadMnemonic() async {
-    final result = await db.getMnemonicFromFirebase();
+    final locked = await db.getMnemonicFromFirebase();//sifreli dondurdu //bu String grliyor 
+    final encrypted = encrypt.Encrypted.fromBase64(locked); // Stringi Encrypted a dönüştürüyoz
+    final result = encryptionService.decryptMnemonic(encrypted); // bize string lazım zaten decrypt de string veriyor
     setState((){
       mnemonic = result;
       words = mnemonic!.split(' ');

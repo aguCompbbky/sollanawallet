@@ -1,10 +1,13 @@
+import 'package:encrypt/encrypt.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:walletsolana/main.dart';
+import 'package:walletsolana/services/encryption_service.dart';
 
 class FireStoreService {
+  EncryptionService encryptionService = EncryptionService();
   final db = FirebaseFirestore.instance.collection(
     "Users",
   ); // veri tabanını başlattık
@@ -22,12 +25,13 @@ class FireStoreService {
       final user = userCredential.user;
       if (userCredential.user != null) {
         // Wallet oluştur
-        final mnemonic = await walletService.generateMnemonic();
-        final wallet = await walletService.createWalletFromMnemonic(mnemonic);
+        final publicMnemonic = await walletService.generateMnemonic();
+        final mnemonic = encryptionService.encryptMnemonic(publicMnemonic);
+        final wallet = await walletService.createWalletFromMnemonic(publicMnemonic); // sk açık hali ile oluşturulmalı
 
         await walletService.secureStorage.write(
           key: 'mnemonic_${email.toLowerCase()}',
-          value: mnemonic,
+          value: mnemonic.toString(),
         );
         await walletService.secureStorage.write(
           key: 'address_${email.toLowerCase()}',
@@ -35,7 +39,7 @@ class FireStoreService {
         );
         print("Address stored with key: address_${email.toLowerCase()}");
 
-        print("Mnemonic: $mnemonic");
+        print("Mnemonic: ${mnemonic.toString()}");
         print("Address: ${wallet.address}");
         await db.doc(user?.uid).set({
           //şifreyi db ye kaydetmeye grek yok firebase onu tutuyor zaten
@@ -44,7 +48,7 @@ class FireStoreService {
           "username": username,
           "createdAt": DateTime.now(),
           "publicKey": wallet.address,
-          "mnemonic": mnemonic,
+          "mnemonic": mnemonic.base64, //mnemonic firebase kayıt
         });
       }
     } on FirebaseAuthException catch (e) {
@@ -110,24 +114,18 @@ class FireStoreService {
 
   Future<String> getMnemonicFromFirebase() async {
 
-    try {
+    
       final user = FirebaseAuth.instance.currentUser;
       final db = FirebaseFirestore.instance;
       final snapshot = await db.collection("Users").doc(user!.uid).get();
 
-    if (snapshot.exists) {
-      var mnemonic = snapshot['mnemonic'];
+   
+      String mnemonic = snapshot['mnemonic'];//sifreli
       print('Mnemonic: $mnemonic');
       return mnemonic;
-    } else {
-      print('Mnemonic bulunamadı');
-      return "Mnemonic bulunamadı";
-    }
+     
       
-    } catch (e) {
-      print('Hata: $e');
-      return(e.toString());
-    }
+    
     
   }
 }
