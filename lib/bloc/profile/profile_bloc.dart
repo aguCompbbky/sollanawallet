@@ -14,7 +14,7 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
       try {
         print("photoService: $photo");
         final String url = await photo.savePhotos(event.image);
-        emit(SuccessfulState(photoUrl: url));
+        emit(SuccessfulPhotoState(photoUrl: url));
       } catch (e, stackTrace) {
         emit(ErrorPhotoState(error: e.toString()));
         print("STACK: $stackTrace");
@@ -23,5 +23,12 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
 
       }
     });
+
+    on<ChangeWalletEvent>((event, emit) {
+      
+      
+    });
+
+
   }
 }

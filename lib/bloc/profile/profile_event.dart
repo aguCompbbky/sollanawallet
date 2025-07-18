@@ -15,3 +15,11 @@ class SavePPEvent extends ProfileEvent{
   @override
   List<Object?> get props => [image]; // image değişkenine göre objeleri karşılaştırırken işimze yarayacak
 }
+
+class ChangeWalletEvent extends ProfileEvent{
+  final String publicKey;
+  final String mnemonic;
+
+  ChangeWalletEvent(this.publicKey, this.mnemonic);
+
+}

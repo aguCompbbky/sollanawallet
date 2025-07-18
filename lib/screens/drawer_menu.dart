@@ -139,7 +139,7 @@ class _PPWidget extends StatelessWidget {
           child: BlocBuilder<ProfileBloc, ProfileState>(
             builder: (context, state) {
               String? profileUrl;
-              if (state is SuccessfulState) {
+              if (state is SuccessfulPhotoState) {
                 profileUrl = state.photoUrl;
               }
               return IconButton(
