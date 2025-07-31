@@ -8,7 +8,6 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:walletsolana/bloc/profile/profile_bloc.dart';
 import 'package:walletsolana/bloc/wallet/wallet_bloc.dart';
 import 'package:walletsolana/firebase_options.dart';
-import 'package:walletsolana/repo/wallet_repo.dart';
 import 'package:walletsolana/screens/login_screen.dart';
 import 'package:walletsolana/screens/main_screen.dart';
 import 'package:walletsolana/screens/mnemonic_screen.dart';
@@ -35,7 +34,7 @@ Future<void> main() async {
   runApp(
   MultiBlocProvider(
     providers: [
-      BlocProvider(create: (_) => ProfileBloc(WalletRepo())),  // ProfileBloc
+      BlocProvider(create: (_) => ProfileBloc()),  // ProfileBloc
     
     ],
     child: MyApp(),
@@ -48,7 +47,7 @@ final GoRouter _router = GoRouter(
     GoRoute(
       path: '/',
       builder: (BuildContext context, GoRouterState state) {
-        return const StartScreen(); //
+        return const StartScreen(); 
       },
       routes: <RouteBase>[
         GoRoute(

@@ -1,5 +1,3 @@
-import 'dart:typed_data';
-
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -13,7 +11,6 @@ import 'package:walletsolana/main.dart';
 import 'package:walletsolana/models/wallet_model.dart';
 import 'package:walletsolana/screens/add_wallet_popup_screen.dart';
 import 'package:walletsolana/services/encryption_service.dart';
-import 'package:walletsolana/services/pp_service.dart';
 import 'package:walletsolana/utilities/image_utilities.dart';
 import 'package:walletsolana/utilities/padding_utilities.dart';
 import 'package:walletsolana/utilities/text_utilities.dart';

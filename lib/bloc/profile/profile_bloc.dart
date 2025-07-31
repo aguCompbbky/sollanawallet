@@ -3,14 +3,14 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:walletsolana/bloc/profile/profile_event.dart';
 import 'package:walletsolana/bloc/profile/profile_state.dart';
-import 'package:walletsolana/models/user_model.dart';
-import 'package:walletsolana/repo/wallet_repo.dart';
+
+
 
 class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
-  final WalletRepo walletRepo;
+ 
 
 
-  ProfileBloc(this.walletRepo) : super(UserLoadingState()) {
+  ProfileBloc() : super(UserLoadingState()) {
 
     on<ShowSubWalletsEvent>((event, emit) {
       //buradada repo layerınındaki fonksiyonları kullanacağız amacımız wallet değişince getPKeventteki pk nın değişmesi

@@ -114,7 +114,6 @@ class WalletBloc extends Bloc<WalletEvent, WalletState> {
     });
     on<AddWalletEvent>((event, emit) async {
       try {
-        // Yeni cüzdanı Firestore'a ekle
         await db.addWallet(
           FirebaseAuth.instance.currentUser!.uid,
           event.wallet,
@@ -140,7 +139,7 @@ class WalletBloc extends Bloc<WalletEvent, WalletState> {
 
     on<GetUserWalletsEvent>((event, emit) async {
       try {
-        final wallets = await db.getUserWallets(
+        final wallets = await db.getWallet(
           FirebaseAuth.instance.currentUser!.uid,
         );
         emit(WalletListState(wallets: wallets, publicKey: ''));
