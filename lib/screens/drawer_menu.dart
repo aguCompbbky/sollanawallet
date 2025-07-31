@@ -1,5 +1,7 @@
 import 'dart:typed_data';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -10,6 +12,11 @@ import 'package:walletsolana/bloc/profile/profile_state.dart';
 import 'package:walletsolana/bloc/wallet/wallet_bloc.dart';
 import 'package:walletsolana/bloc/wallet/wallet_event.dart';
 import 'package:walletsolana/bloc/wallet/wallet_state.dart';
+import 'package:walletsolana/main.dart';
+import 'package:walletsolana/models/user_model.dart';
+import 'package:walletsolana/models/wallet_model.dart';
+import 'package:walletsolana/screens/add_wallet_popup_screen.dart';
+import 'package:walletsolana/services/encryption_service.dart';
 import 'package:walletsolana/services/pp_service.dart';
 import 'package:walletsolana/utilities/image_utilities.dart';
 import 'package:walletsolana/utilities/padding_utilities.dart';
@@ -39,15 +46,17 @@ class _DrawerMenuState extends State<DrawerMenu> {
 
 class MenuItems extends StatelessWidget {
   const MenuItems({super.key});
+  
 
   @override
   Widget build(BuildContext context) {
+    EncryptionService encrypt = EncryptionService();
     const String pp = "assets/images/pp.png";
     String? pk;
     return BlocBuilder<WalletBloc, WalletState>(
       builder: (context, state) {
         if (state is GetPKState) {
-          //print("GetPKState'den gelen PK: ${state.pk}");
+          
           pk = state.pk;
         }
         return Column(
@@ -111,6 +120,59 @@ class MenuItems extends StatelessWidget {
 
             Divider(),
 
+            ChangeWalletPopup(),
+
+            ListTile(
+              leading: DrawerIconWidget(image: ImageUtilities.iconPlus),
+              title: TextDrawerWigdet(
+                text: "Add New Wallet",
+                color: Colors.black,
+              ),
+              onTap: () async {
+                //wallet ekle
+                
+               
+                final newMnemonic = await walletService
+                    .generateMnemonic();  
+                final newWallet = await walletService.createWalletFromMnemonic(
+                  newMnemonic,
+                ); 
+                final encryptedMnemonic = encrypt.encryptMnemonic(newMnemonic);
+                final newPublicKey = newWallet.address; 
+                final newMnemonicValue = encryptedMnemonic.base64; 
+
+                
+                final wallet = WalletModel(
+                  publicKey: newPublicKey,
+                  mnemonic: newMnemonicValue,
+                );
+
+               
+                context.read<WalletBloc>().add(AddWalletEvent(wallet: wallet));
+
+
+                
+
+                
+                showDialog(
+                  context: context,
+                  builder: (context) {
+                    return AlertDialog(
+                      scrollable: true,
+                      insetPadding: PaddingUtilities.paddingTopBottom,
+                      content: TitleLargeWigdet(
+                        text: "Wallet was added",
+                        color: Colors.black,
+                      ),
+                    );
+                  },
+                );
+
+                
+              },
+            ),
+
+           
             Align(
               alignment: Alignment.bottomRight,
               child: TextButton(onPressed: () {}, child: Text("log out")),
@@ -129,49 +191,13 @@ class _PPWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (context) => ProfileBloc(PpService()),
-
-      child: Align(
-        alignment: Alignment.topLeft,
-        child: Padding(
-          padding: PaddingUtilities.paddingLeft / 1.2,
-          child: BlocBuilder<ProfileBloc, ProfileState>(
-            builder: (context, state) {
-              String? profileUrl;
-              if (state is SuccessfulPhotoState) {
-                profileUrl = state.photoUrl;
-              }
-              return IconButton(
-                onPressed: () async {
-                  print("statee" + state.toString());
-                  final picker = ImagePicker();
-                  final XFile? image = await picker.pickImage(
-                    source: ImageSource.gallery,
-                  );
-
-                  if (image != null) {
-                    final Uint8List imageBytes = await image.readAsBytes();
-                    context.read<ProfileBloc>().add(SavePPEvent(imageBytes));
-                  }
-                },
-                icon: CircleAvatar(
-                  radius: 64,
-                  child: profileUrl != null
-                      ? CircleAvatar(
-                          radius: 64,
-                          backgroundImage: NetworkImage(profileUrl),
-                        )
-                      : CircleAvatar(
-                          radius: 64,
-                          backgroundImage: AssetImage(
-                            pp,
-                          ), // yedek default görsel
-                        ),
-                ),
-              );
-            },
-          ),
+    return Align(
+      alignment: Alignment.topLeft,
+      child: Padding(
+        padding: PaddingUtilities.paddingLeft / 1.2,
+        child: CircleAvatar(
+          radius: 64,
+          child: CircleAvatar(radius: 64, backgroundImage: AssetImage(pp)),
         ),
       ),
     );

@@ -1,34 +1,20 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:walletsolana/bloc/profile/profile_event.dart';
 import 'package:walletsolana/bloc/profile/profile_state.dart';
-import 'package:walletsolana/services/pp_service.dart';
+import 'package:walletsolana/models/user_model.dart';
+import 'package:walletsolana/repo/wallet_repo.dart';
 
 class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
-  PpService photo = PpService();
+  final WalletRepo walletRepo;
 
-  ProfileBloc(this.photo) : super(InitialStateProfile()) {
-    on<SavePPEvent>((event, emit) async {
-      print("SavePPEvent triggered");
-      emit(InitialStateProfile());
-      try {
-        print("photoService: $photo");
-        final String url = await photo.savePhotos(event.image);
-        emit(SuccessfulPhotoState(photoUrl: url));
-      } catch (e, stackTrace) {
-        emit(ErrorPhotoState(error: e.toString()));
-        print("STACK: $stackTrace");
-        Fluttertoast.showToast(msg: e.toString());
-        print(e.toString());
 
-      }
-    });
+  ProfileBloc(this.walletRepo) : super(UserLoadingState()) {
 
-    on<ChangeWalletEvent>((event, emit) {
-      
+    on<ShowSubWalletsEvent>((event, emit) {
+      //buradada repo layerınındaki fonksiyonları kullanacağız amacımız wallet değişince getPKeventteki pk nın değişmesi
       
     });
-
-
   }
 }

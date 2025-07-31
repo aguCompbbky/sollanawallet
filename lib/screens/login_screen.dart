@@ -21,7 +21,7 @@ class LogInScreen extends StatefulWidget {
 }
 
 class _LogInScreenState extends State<LogInScreen> {
-  final emailController = TextEditingController(text: "galaksilife8@gmail.com");
+  final emailController = TextEditingController(text: "sifreli24@gmail.com");
   final passwordController = TextEditingController(text: "123456");
   WalletService walletService =
       WalletService(); // geçici olarak bussinessdan çekildi

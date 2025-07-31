@@ -1,11 +1,14 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:walletsolana/bloc/profile/profile_bloc.dart';
 import 'package:walletsolana/bloc/wallet/wallet_bloc.dart';
 import 'package:walletsolana/firebase_options.dart';
+import 'package:walletsolana/repo/wallet_repo.dart';
 import 'package:walletsolana/screens/login_screen.dart';
 import 'package:walletsolana/screens/main_screen.dart';
 import 'package:walletsolana/screens/mnemonic_screen.dart';
@@ -16,6 +19,7 @@ import 'package:walletsolana/services/wallet_services.dart';
 import 'package:walletsolana/utilities/text_utilities.dart';
 
 final walletService = WalletService();
+final FirebaseFirestore firestore = FirebaseFirestore.instance;
 
 late final FirebaseApp app;
 late final FirebaseAuth auth;
@@ -28,7 +32,15 @@ Future<void> main() async {
   );
   auth = FirebaseAuth.instanceFor(app: app);
 
-  runApp(const MyApp());
+  runApp(
+  MultiBlocProvider(
+    providers: [
+      BlocProvider(create: (_) => ProfileBloc(WalletRepo())),  // ProfileBloc
+    
+    ],
+    child: MyApp(),
+  ),
+  );
 }
 
 final GoRouter _router = GoRouter(
@@ -81,8 +93,11 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (context) => WalletBloc(walletService),
+    return MultiBlocProvider(
+      providers: [
+
+        BlocProvider(create: (_) => WalletBloc(walletService)),
+      ],
       child: MaterialApp.router(
         routerConfig: _router,
         theme: ThemeData(
@@ -97,3 +112,4 @@ class MyApp extends StatelessWidget {
     );
   }
 }
+

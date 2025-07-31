@@ -1,18 +1,18 @@
-import 'package:encrypt/encrypt.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-import 'package:walletsolana/main.dart';
+import 'package:walletsolana/models/wallet_model.dart';
 import 'package:walletsolana/services/encryption_service.dart';
+import 'package:walletsolana/services/wallet_services.dart';
 
 class FireStoreService {
   EncryptionService encryptionService = EncryptionService();
-  final db = FirebaseFirestore.instance.collection(
-    "Users",
-  ); // veri tabanını başlattık
+  final db = FirebaseFirestore.instance.collection("Users");
   final auth = FirebaseAuth.instance;
+  WalletService walletService = WalletService();
 
+  // Kullanıcıyı kaydetme fonksiyonu
   Future<void> signUp({
     required String name,
     required String username,
@@ -20,14 +20,14 @@ class FireStoreService {
     required String password,
   }) async {
     try {
-      final UserCredential userCredential = await auth
-          .createUserWithEmailAndPassword(email: email, password: password);
+      final UserCredential userCredential = await auth.createUserWithEmailAndPassword(
+          email: email, password: password);
       final user = userCredential.user;
       if (userCredential.user != null) {
         // Wallet oluştur
         final publicMnemonic = await walletService.generateMnemonic();
         final mnemonic = encryptionService.encryptMnemonic(publicMnemonic);
-        final wallet = await walletService.createWalletFromMnemonic(publicMnemonic); // sk açık hali ile oluşturulmalı
+        final wallet = await walletService.createWalletFromMnemonic(publicMnemonic); // Open wallet
 
         await walletService.secureStorage.write(
           key: 'mnemonic_${email.toLowerCase()}',
@@ -39,16 +39,15 @@ class FireStoreService {
         );
         print("Address stored with key: address_${email.toLowerCase()}");
 
-        print("Mnemonic: ${mnemonic.toString()}");
-        print("Address: ${wallet.address}");
+        // Firestore'da kullanıcı bilgilerini ve wallet'ı kaydetme
         await db.doc(user?.uid).set({
-          //şifreyi db ye kaydetmeye grek yok firebase onu tutuyor zaten
           "name": name,
           "email": email,
           "username": username,
           "createdAt": DateTime.now(),
           "publicKey": wallet.address,
-          "mnemonic": mnemonic.base64, //mnemonic firebase kayıt
+          "mnemonic": mnemonic.base64, // Mnemonic'i Firebase'e kaydet
+          "subWallets": [], // Başlangıçta boş bir alt cüzdan listesi
         });
       }
     } on FirebaseAuthException catch (e) {
@@ -57,6 +56,7 @@ class FireStoreService {
     }
   }
 
+  // Kullanıcı girişi için fonksiyon
   Future<void> loginUser({
     required String email,
     required String password,
@@ -69,23 +69,19 @@ class FireStoreService {
 
       if (userCredential.user != null) {
         final uid = userCredential.user!.uid;
-        final userDoc = await FirebaseFirestore.instance
-            .collection("Users")
-            .doc(uid)
-            .get(); //firebasedan publik keyi çekiyoruz
+        final userDoc = await FirebaseFirestore.instance.collection("Users").doc(uid).get();
 
         final publicKey = userDoc.data()?['publicKey'];
 
         if (publicKey != null) {
           await walletService.secureStorage.write(
-            //ardından secureStrorage ye yazıyoz ki get fonksiyonunu bununla yazmıştık baştan yazmayalım
             key: 'address_${email.toLowerCase()}',
             value: publicKey,
           );
-          print("publickey added to secureStorage: $publicKey");
+          print("publicKey added to secureStorage: $publicKey");
         }
 
-        Fluttertoast.showToast(msg: "Login successful ");
+        Fluttertoast.showToast(msg: "Login successful");
       }
     } on FirebaseAuthException catch (e) {
       Fluttertoast.showToast(msg: e.message!);
@@ -93,9 +89,9 @@ class FireStoreService {
     }
   }
 
+  // Google ile giriş fonksiyonu
   Future<bool> loginWithGoogle() async {
     final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
-
     GoogleSignInAuthentication userAuth = await googleUser!.authentication;
 
     var thirdParty = GoogleAuthProvider.credential(
@@ -105,27 +101,57 @@ class FireStoreService {
 
     FirebaseAuth.instance.signInWithCredential(
       thirdParty,
-    ); //3rd party credentials facebook Google
-
-    //print("google user ${FirebaseAuth.instance.currentUser}");
+    );
 
     return FirebaseAuth.instance.currentUser != null;
   }
 
+  // Firebase'den mnemonic'i almak
   Future<String> getMnemonicFromFirebase() async {
+    final user = FirebaseAuth.instance.currentUser;
+    final snapshot = await db.doc(user!.uid).get();
+    String mnemonic = snapshot['mnemonic']; // Şifreli mnemonic
+    print('Mnemonic: $mnemonic');
+    return mnemonic;
+  }
 
-    
-      final user = FirebaseAuth.instance.currentUser;
-      final db = FirebaseFirestore.instance;
-      final snapshot = await db.collection("Users").doc(user!.uid).get();
+Future<void> addWallet(String userId, WalletModel wallet) async {
+    try {
+      final userDoc = db.doc(userId);
 
-   
-      String mnemonic = snapshot['mnemonic'];//sifreli
-      print('Mnemonic: $mnemonic');
-      return mnemonic;
-     
-      
-    
-    
+      // Yeni alt cüzdanı Firestore'a ekle
+      await userDoc.update({
+        'subWallets': FieldValue.arrayUnion([wallet.toJson()]),
+      });
+      print('Wallet added to subWallets');
+    } catch (e) {
+      print('Error adding wallet: $e');
+    }
+  }
+
+    Future<List<WalletModel>> getUserWallets(String userId) async {
+    try {
+      final docSnapshot = await db.doc(userId).get();
+      if (docSnapshot.exists) {
+        final data = docSnapshot.data();
+        final List<dynamic> walletsData = data?['subWallets'] ?? [];
+        return walletsData.map((wallet) => WalletModel.fromJson(wallet)).toList();
+      } else {
+        return [];
+      }
+    } catch (e) {
+      print('Error getting user wallets: $e');
+      return [];
+    }
+  }
+
+  Future<void> updateActiveWallet(String userId, String publicKey) async {
+    try {
+      final userDoc = db.doc(userId);
+      await userDoc.update({'activeWallet': publicKey});
+      print('Active wallet updated');
+    } catch (e) {
+      print('Error updating active wallet: $e');
+    }
   }
 }

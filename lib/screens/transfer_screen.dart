@@ -42,6 +42,7 @@ class _TransferScreenState extends State<TransferScreen> {
         leading: IconButton(
           onPressed: () {
             context.go("/main");
+            context.read<WalletBloc>().add(ShowPKEvent());
           },
           icon: Icon(Icons.arrow_back),
         ),

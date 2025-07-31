@@ -1,5 +1,9 @@
 import 'dart:typed_data';
 
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:solana/solana.dart';
+import 'package:walletsolana/models/wallet_model.dart';
+
 abstract class WalletEvent {}
 
 class ShowPKEvent extends WalletEvent {}
@@ -22,3 +26,16 @@ class TransferSOLEvent extends WalletEvent {
   final String reciverPubKey;
   final int amount;
 }
+class AddWalletEvent extends WalletEvent {
+  final WalletModel wallet;
+
+  AddWalletEvent({required this.wallet});
+}
+
+class SwitchActiveWalletEvent extends WalletEvent {
+  final String publicKey;
+
+  SwitchActiveWalletEvent({required this.publicKey});
+}
+
+class GetUserWalletsEvent extends WalletEvent {}

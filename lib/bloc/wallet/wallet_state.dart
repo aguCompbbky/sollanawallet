@@ -1,6 +1,7 @@
 
 
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:walletsolana/models/wallet_model.dart';
 
 abstract class WalletState {
 final String publicKey;
@@ -46,4 +47,18 @@ class GetSolBalanceState extends WalletState {
 class TransferState extends WalletState{
   final String reciverPubKey;
   TransferState({required this.reciverPubKey}) : super(publicKey: '');
+}
+
+class AddWalletSuccessState extends WalletState {
+  AddWalletSuccessState({required super.publicKey});
+}
+
+class WalletsLoadedState extends WalletState {
+  final List<WalletModel> wallets;
+
+  WalletsLoadedState({required this.wallets, required super.publicKey});
+}
+
+class ActiveWalletSwitchedState extends WalletState {
+  ActiveWalletSwitchedState({required super.publicKey});
 }
