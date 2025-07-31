@@ -1,19 +1,15 @@
 import 'dart:typed_data';
 
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'package:image_picker/image_picker.dart';
-import 'package:walletsolana/bloc/profile/profile_bloc.dart';
-import 'package:walletsolana/bloc/profile/profile_event.dart';
-import 'package:walletsolana/bloc/profile/profile_state.dart';
+
 import 'package:walletsolana/bloc/wallet/wallet_bloc.dart';
 import 'package:walletsolana/bloc/wallet/wallet_event.dart';
 import 'package:walletsolana/bloc/wallet/wallet_state.dart';
 import 'package:walletsolana/main.dart';
-import 'package:walletsolana/models/user_model.dart';
+
 import 'package:walletsolana/models/wallet_model.dart';
 import 'package:walletsolana/screens/add_wallet_popup_screen.dart';
 import 'package:walletsolana/services/encryption_service.dart';
