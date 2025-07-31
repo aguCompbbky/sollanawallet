@@ -85,7 +85,6 @@ class MyApp extends StatelessWidget {
       create: (context) => WalletBloc(walletService),
       child: MaterialApp.router(
         routerConfig: _router,
-
         theme: ThemeData(
           textTheme: GoogleFonts.robotoTextTheme().copyWith(
             titleMedium: TextStyle(
