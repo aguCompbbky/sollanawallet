@@ -1,7 +1,5 @@
 # Wallet Solana
 
-Start Page
-
 
 <img width="399" height="840" alt="image" src="https://github.com/user-attachments/assets/f4777edf-4e81-44d5-b27d-d79377e262a4" />
 
