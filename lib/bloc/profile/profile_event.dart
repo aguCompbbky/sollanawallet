@@ -1,7 +1,6 @@
 import 'dart:typed_data';
 
 import 'package:equatable/equatable.dart';
-import 'package:walletsolana/models/user_model.dart';
 abstract class ProfileEvent extends Equatable {
   
   @override

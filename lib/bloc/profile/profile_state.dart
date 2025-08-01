@@ -14,7 +14,6 @@ class SuccessfulPhotoState extends ProfileState{
 
   SuccessfulPhotoState({required this.photoUrl});
 
-  @override
   List<Object?> get props => [photoUrl];
 }
 

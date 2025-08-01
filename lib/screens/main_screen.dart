@@ -1,14 +1,10 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:walletsolana/bloc/profile/profile_bloc.dart';
-import 'package:walletsolana/bloc/profile/profile_event.dart';
 import 'package:walletsolana/bloc/wallet/wallet_bloc.dart';
 import 'package:walletsolana/bloc/wallet/wallet_event.dart';
 import 'package:walletsolana/bloc/wallet/wallet_state.dart';
-import 'package:walletsolana/models/user_model.dart';
 import 'package:walletsolana/screens/drawer_menu.dart';
 import 'package:walletsolana/services/wallet_services.dart';
 import 'package:walletsolana/utilities/form_utilities.dart';
@@ -89,10 +85,10 @@ class _MainScreenState extends State<MainScreen> {
 class _SearchBarWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final SearchController = TextEditingController();
+    final searchController = TextEditingController();
     return Padding(
       padding: PaddingUtilities.paddingRightLeft * 2,
-      child: EmailFormWidget(text: "Search", controller: SearchController),
+      child: EmailFormWidget(text: "Search", controller: searchController),
     );
   }
 }

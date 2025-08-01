@@ -10,6 +10,7 @@ import 'package:walletsolana/utilities/color_utilities.dart';
 import 'package:walletsolana/utilities/form_utilities.dart';
 import 'package:walletsolana/utilities/padding_utilities.dart';
 import 'package:walletsolana/utilities/text_utilities.dart';
+import 'package:lottie/lottie.dart';
 
 WalletService walletService = WalletService();
 
@@ -29,7 +30,7 @@ class _TransferScreenState extends State<TransferScreen> {
     context.read<WalletBloc>().add(
       GetSolBalanceEvent(publicKey: widget.pk ?? ""),
     );
-    print("initsTAte" + widget.pk.toString()); 
+    print("initsTAte" + widget.pk.toString());
   }
 
   String? balance;
@@ -127,7 +128,10 @@ class _TransferScreenState extends State<TransferScreen> {
 }
 
 class BalanceWidget extends StatelessWidget {
-  const BalanceWidget(this.solText, {super.key});
+  const BalanceWidget(
+    this.solText, {
+    super.key,
+  });
   final String solText;
 
   @override
@@ -148,6 +152,30 @@ class BalanceWidget extends StatelessWidget {
   }
 
   Padding _buildCard(String solText) {
+    if (solText == "999") {
+      return Padding(
+        padding: PaddingUtilities.paddingTop * 2,
+        child: SizedBox(
+          height: 252,
+           width: 352,
+           child: Card(
+          color: Colors.amber,
+          child: Column(
+            children: [
+              Padding(
+                padding: PaddingUtilities.paddingTopBottom/1.6,
+                child: TitleMediumWigdet(
+                  text: 'Solana Balance',
+                  color: Colors.white,
+                ),
+              ),
+              Expanded(child: Lottie.asset("assets/lottie/Payment_Failed.json")),
+            ],
+          ),
+        ),
+           ),
+      );
+    }
     return Padding(
       padding: PaddingUtilities.paddingTop * 2,
       child: SizedBox(

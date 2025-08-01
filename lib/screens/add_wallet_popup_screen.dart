@@ -7,7 +7,7 @@ import 'package:walletsolana/screens/drawer_menu.dart';
 import 'package:walletsolana/screens/wallet_list.dart';
 import 'package:walletsolana/utilities/image_utilities.dart';
 import 'package:walletsolana/utilities/text_utilities.dart';
-
+import 'package:lottie/lottie.dart';
 class ChangeWalletPopup extends StatelessWidget {
   const ChangeWalletPopup({super.key});
 
@@ -66,7 +66,13 @@ class ChangeWalletPopup extends StatelessWidget {
                     } else {
                       return AlertDialog(
                         title: Text("Error"),
-                        content: Text("Failed to load wallets"),
+                        content: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Lottie.asset("assets/lottie/Lonely404.json"),
+                            Text("Page is not found.")
+                          ],
+                        ),
                       );
                     }
                   },

@@ -1,7 +1,5 @@
 import 'dart:typed_data';
 
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:solana/solana.dart';
 import 'package:walletsolana/models/wallet_model.dart';
 
 abstract class WalletEvent {}
