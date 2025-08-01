@@ -5,10 +5,8 @@ class TextUtilities {
   //Texts
   static const String singUp = "Sign Up";//start page
   static const String logIn = "Log In";//start page
-
   static const String solidium = "Solidium";//login page
   static const String welcomeBack = "Welcome Back";//login page
-
   static const String welcome = "Welcome";//register page
 
 

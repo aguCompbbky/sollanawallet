@@ -21,10 +21,18 @@ class LogInScreen extends StatefulWidget {
 }
 
 class _LogInScreenState extends State<LogInScreen> {
-  final emailController = TextEditingController(text: "sifreli24@gmail.com");
-  final passwordController = TextEditingController(text: "123456");
+  final _emailController = TextEditingController(text: "sifreli24@gmail.com");
+  final _passwordController = TextEditingController(text: "123456");
   WalletService walletService =
       WalletService(); // geçici olarak bussinessdan çekildi
+
+  @override
+  void dispose() {
+    //memory leakları engeller birde controllerların set edilmiş halde kalmasını önler.
+    _emailController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -67,12 +75,12 @@ class _LogInScreenState extends State<LogInScreen> {
                     _gap24px(),
                     EmailFormWidget(
                       text: "E-mail",
-                      controller: emailController,
+                      controller: _emailController,
                     ),
                     _gap24px(),
                     PasswordFormWidget(
                       text: "Password",
-                      controller: passwordController,
+                      controller: _passwordController,
                     ),
                     _gap24px(),
                     _gap24px(),
@@ -83,8 +91,9 @@ class _LogInScreenState extends State<LogInScreen> {
 
               BlocConsumer<AuthBloc, AuthState>(
                 listener: (context, state) async {
-                  if (state is LoginedGoogleState){context.go("/main");}
-                  else if (state is LoginedState ) {
+                  if (state is LoginedGoogleState) {
+                    context.go("/main");
+                  } else if (state is LoginedState) {
                     context.go("/main");
                     await walletService.initWalletForUser(state.email);
                     print(state);
@@ -93,6 +102,11 @@ class _LogInScreenState extends State<LogInScreen> {
                   }
                 },
                 builder: (context, state) {
+                  final googleImg = "assets/images/google.png";
+                  final appleImg = "assets/images/apple.png";
+                  final facebookImg = "assets/images/facebook.png";
+                  final loginGoogleHeight = 36.0;
+                  
                   return Padding(
                     padding: PaddingUtilities.paddingRightLeft,
                     child: Column(
@@ -108,16 +122,14 @@ class _LogInScreenState extends State<LogInScreen> {
                             onpressed: () {
                               context.read<AuthBloc>().add(
                                 LoginWithEmailEvent(
-                                  emailController.text,
-                                  passwordController.text,
+                                  _emailController.text,
+                                  _passwordController.text,
                                 ),
                               ); // eventi başlat
                             },
                           ),
                         ),
-                        _gap24px(),
-                        _gap24px(),
-                        _gap24px(),
+                        _gap72px(),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
@@ -128,13 +140,12 @@ class _LogInScreenState extends State<LogInScreen> {
                                 );
                               }, // google auth
                               icon: SizedBox(
-                                //color: Colors.white,
                                 child: Padding(
-                                  padding: const EdgeInsets.all(20.0),
+                                  padding: PaddingUtilities.paddingAll20,
                                   child: Image.asset(
-                                    "assets/images/google.png",
-                                    width: 36,
-                                    height: 36,
+                                    googleImg,
+                                    width: loginGoogleHeight,
+                                    height: loginGoogleHeight,
                                   ),
                                 ),
                               ),
@@ -143,11 +154,11 @@ class _LogInScreenState extends State<LogInScreen> {
                             SizedBox(
                               //color: Colors.white,
                               child: Padding(
-                                padding: const EdgeInsets.all(20.0),
+                                padding: PaddingUtilities.paddingAll20,
                                 child: Image.asset(
-                                  "assets/images/apple.png",
-                                  width: 36,
-                                  height: 36,
+                                  appleImg,
+                                  width: loginGoogleHeight,
+                                  height: loginGoogleHeight,
                                 ),
                               ),
                             ),
@@ -155,11 +166,11 @@ class _LogInScreenState extends State<LogInScreen> {
                             SizedBox(
                               //color: Colors.white,
                               child: Padding(
-                                padding: const EdgeInsets.all(20.0),
+                                padding: PaddingUtilities.paddingAll20,
                                 child: Image.asset(
-                                  "assets/images/facebook.png",
-                                  width: 36,
-                                  height: 36,
+                                  facebookImg,
+                                  width: loginGoogleHeight,
+                                  height: loginGoogleHeight,
                                 ),
                               ),
                             ),
@@ -178,4 +189,5 @@ class _LogInScreenState extends State<LogInScreen> {
   }
 
   SizedBox _gap24px() => SizedBox(height: 24);
+  SizedBox _gap72px() => SizedBox(height: 72);
 }

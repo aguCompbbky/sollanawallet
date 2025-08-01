@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -39,7 +38,6 @@ class _DrawerMenuState extends State<DrawerMenu> {
 
 class MenuItems extends StatelessWidget {
   const MenuItems({super.key});
-  
 
   @override
   Widget build(BuildContext context) {
@@ -49,7 +47,6 @@ class MenuItems extends StatelessWidget {
     return BlocBuilder<WalletBloc, WalletState>(
       builder: (context, state) {
         if (state is GetPKState) {
-          
           pk = state.pk;
         }
         return Column(
@@ -123,30 +120,22 @@ class MenuItems extends StatelessWidget {
               ),
               onTap: () async {
                 //wallet ekle
-                
-               
-                final newMnemonic = await walletService
-                    .generateMnemonic();  
+
+                final newMnemonic = await walletService.generateMnemonic();
                 final newWallet = await walletService.createWalletFromMnemonic(
                   newMnemonic,
-                ); 
+                );
                 final encryptedMnemonic = encrypt.encryptMnemonic(newMnemonic);
-                final newPublicKey = newWallet.address; 
-                final newMnemonicValue = encryptedMnemonic.base64; 
+                final newPublicKey = newWallet.address;
+                final newMnemonicValue = encryptedMnemonic.base64;
 
-                
                 final wallet = WalletModel(
                   publicKey: newPublicKey,
                   mnemonic: newMnemonicValue,
                 );
 
-               
                 context.read<WalletBloc>().add(AddWalletEvent(wallet: wallet));
 
-
-                
-
-                
                 showDialog(
                   context: context,
                   builder: (context) {
@@ -160,12 +149,9 @@ class MenuItems extends StatelessWidget {
                     );
                   },
                 );
-
-                
               },
             ),
 
-           
             Align(
               alignment: Alignment.bottomRight,
               child: TextButton(onPressed: () {}, child: Text("log out")),

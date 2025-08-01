@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -22,10 +21,6 @@ class MainScreen extends StatefulWidget {
 class _MainScreenState extends State<MainScreen> {
   final WalletService walletService = WalletService();
 
-
-
-
-
   @override
   Widget build(BuildContext context) {
     final screenSize = MediaQuery.of(context).size;
@@ -48,8 +43,8 @@ class _MainScreenState extends State<MainScreen> {
             ),
           ),
           body: Container(
-            width: screenSize.width,
-            //arka plan resmi ekranı kaplasın diye böyle kullanmıştım
+            width: screenSize
+                .width, //arka plan resmi ekranı kaplasın diye böyle kullanmıştım
             height: screenSize.height,
             decoration: BoxDecoration(
               image: DecorationImage(
@@ -121,11 +116,10 @@ class PublicKey extends StatelessWidget {
           //print("GetPKState'den gelen PK: ${state.pk}");
           pk = state.pk;
         }
-         if (state is InitialStateWallet && pk == null) {
+        if (state is InitialStateWallet && pk == null) {
           // ilk başta bir kez tetiklenmesi için ShowPKEvent tetikliyoz
           context.read<WalletBloc>().add(ShowPKEvent());
         }
-        
 
         return Column(
           children: [
@@ -146,19 +140,12 @@ class PublicKey extends StatelessWidget {
                     height: 18,
                     child: TextSmallWigdet(
                       color: const Color.fromARGB(255, 210, 210, 210),
-                      text: pk ?? "deneme",//buranın drawerda yaptığım değişiklikten etkilenip yeni publicKeyin burada yazmasını istiyorum
+                      text: pk ?? "deneme",
+                      //buranın drawerda yaptığım değişiklikten etkilenip yeni publicKeyin burada yazmasını istiyorum
                     ),
                   ),
                 ),
-                IconButton(
-                  onPressed: () {
-                    if (pk != null) {
-                      Clipboard.setData(ClipboardData(text: pk));
-                    }
-                  },
-
-                  icon: Icon(Icons.copy),
-                ),
+                _copyThePK(pk),
               ],
             ),
 
@@ -171,6 +158,17 @@ class PublicKey extends StatelessWidget {
             ),
           ],
         );
+      },
+    );
+  }
+
+  IconButton _copyThePK(String? pk) {
+    return IconButton(
+      icon: Icon(Icons.copy),
+      onPressed: () {
+        if (pk != null) {
+          Clipboard.setData(ClipboardData(text: pk));
+        }
       },
     );
   }

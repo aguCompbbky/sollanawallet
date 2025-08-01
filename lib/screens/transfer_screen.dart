@@ -163,7 +163,7 @@ class BalanceWidget extends StatelessWidget {
           child: Column(
             children: [
               Padding(
-                padding: PaddingUtilities.paddingTopBottom/1.6,
+                padding: PaddingUtilities.paddingTopBottom,
                 child: TitleMediumWigdet(
                   text: 'Solana Balance',
                   color: Colors.white,

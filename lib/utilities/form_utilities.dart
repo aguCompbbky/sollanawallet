@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
 
 class PasswordFormWidget extends StatefulWidget {
-  const PasswordFormWidget({super.key, required this.text, required this.controller});
+  const PasswordFormWidget({
+    super.key,
+    required this.text,
+    required this.controller,
+  });
   final String text;
   final TextEditingController controller;
 
@@ -9,14 +13,10 @@ class PasswordFormWidget extends StatefulWidget {
   State<PasswordFormWidget> createState() => _PasswordFormWidgetState();
 }
 
-
-
-
 class _PasswordFormWidgetState extends State<PasswordFormWidget> {
+  bool _obscureText = true;
 
-bool _obscureText = true;
-
-late String password = widget.controller.text;
+  late String password = widget.controller.text;
 
   @override
   Widget build(BuildContext context) {
@@ -41,14 +41,14 @@ late String password = widget.controller.text;
   }
 }
 
-
 ///////
 
-
-
-
 class EmailFormWidget extends StatefulWidget {
-  const EmailFormWidget({super.key, required this.text, required this.controller});
+  const EmailFormWidget({
+    super.key,
+    required this.text,
+    required this.controller,
+  });
   final String text;
   final TextEditingController controller;
 
@@ -56,12 +56,8 @@ class EmailFormWidget extends StatefulWidget {
   State<EmailFormWidget> createState() => _EmailFormWidgetState();
 }
 
-
-
-
 class _EmailFormWidgetState extends State<EmailFormWidget> {
-
-late String password = widget.controller.text;
+  late String password = widget.controller.text;
 
   @override
   Widget build(BuildContext context) {

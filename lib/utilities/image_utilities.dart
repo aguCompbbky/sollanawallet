@@ -7,13 +7,6 @@ class ImageUtilities {
   static const String iconExplore = "assets/images/explore.png";
   static const String iconWallet = "assets/images/wallet.png";
   static const String iconPlus = "assets/images/plus.png";
-
-
-
-
-
-
-
   }
 
   

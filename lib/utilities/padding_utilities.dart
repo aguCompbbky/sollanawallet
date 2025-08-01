@@ -9,7 +9,5 @@ class PaddingUtilities {
   static const EdgeInsets paddingLeft = EdgeInsets.only(left: _padding);
   static const EdgeInsets paddingTop = EdgeInsets.only(top: _padding*2);
   static const EdgeInsets paddingTopBottom = EdgeInsets.symmetric(vertical: _padding);
-
-   
-  
+  static const EdgeInsets paddingAll20 =  EdgeInsets.all(20.0);
 }
